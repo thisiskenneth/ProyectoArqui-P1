@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  ms-auth:
+    build: ./backend/ms-auth
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+
+  ms-clientes:
+    build: ./backend/ms-clientes
+    ports:
+      - "3002:3002"
+
+  ms-pedidos:
+    build: ./backend/ms-pedidos
+    ports:
+      - "3003:3003"
+
+  ms-ruteo:
+    build: ./backend/ms-ruteo
+    ports:
+      - "3004:3004"
+
+  ms-seguimiento:
+    build: ./backend/ms-seguimiento
+    ports:
+      - "3005:3005"
+
+  graphql-gateway:
+    build: ./backend/graphql-gateway
+    ports:
+      - "4000:4000"
+
+  # Add other services as needed
