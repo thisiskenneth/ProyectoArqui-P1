@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/ms-flota-rest/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-ruteo/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-seguimiento/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-notificaciones/pom.xml" />
+        <option value="$PROJECT_DIR$/graphql-gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-facturacion/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-auth/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-pedidos/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-taller-soap/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-clientes/pom.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="openjdk-25" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>

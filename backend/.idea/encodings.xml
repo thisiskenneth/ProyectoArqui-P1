@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/graphql-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ms-auth/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ms-clientes/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ms-facturacion/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ms-flota-rest/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ms-notificaciones/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ms-pedidos/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ms-ruteo/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ms-seguimiento/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ms-taller-soap/src/main/java" charset="UTF-8" />
+  </component>
+</project>
