@@ -1,0 +1,43 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://espe.edu.ec/mstallersoap"
+           targetNamespace="http://espe.edu.ec/mstallersoap" elementFormDefault="qualified">
+
+    <!-- Consultar Vehiculo -->
+    <xs:element name="ConsultarVehiculoRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="matricula" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="ConsultarVehiculoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="matricula" type="xs:string"/>
+                <xs:element name="estado" type="xs:string"/>
+                <xs:element name="ultimoMantenimiento" type="xs:string"/>
+                <xs:element name="observaciones" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Registrar Orden Mantenimiento -->
+    <xs:element name="RegistrarOrdenMantenimientoRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="matricula" type="xs:string"/>
+                <xs:element name="descripcion" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="RegistrarOrdenMantenimientoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="codigoOrden" type="xs:string"/>
+                <xs:element name="fechaIngreso" type="xs:string"/>
+                <xs:element name="mensaje" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="423fe136-58bc-4de7-9bf0-75bdaf924de4" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/graphql-gateway/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-auth/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-auth/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-clientes/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-clientes/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-facturacion/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-facturacion/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-flota-rest/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-flota-rest/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-flota-rest/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-flota-rest/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-notificaciones/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-notificaciones/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-pedidos/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-pedidos/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-ruteo/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-ruteo/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-seguimiento/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-seguimiento/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-taller-soap/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-taller-soap/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 7
+}]]></component>
+  <component name="ProjectId" id="3DSjO2vXtC71nXimevBq2j7OULP" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "Ken",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/ESPE/9no Semestre/Arquitectura de Software/1er Parcial/Proyecto",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.138" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.29346.138" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="423fe136-58bc-4de7-9bf0-75bdaf924de4" name="Changes" comment="" />
+      <created>1778282329954</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1778282329954</updated>
+      <workItem from="1778282331259" duration="654000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
