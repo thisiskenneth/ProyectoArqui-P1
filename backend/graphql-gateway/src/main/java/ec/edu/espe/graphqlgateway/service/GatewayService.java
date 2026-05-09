@@ -17,6 +17,7 @@ public class GatewayService {
 
     private final OrderClient orderClient;
     private final ShipmentClient shipmentClient;
+    private final TrackingPositionStore trackingPositionStore;
 
     public List<OrderDto> getPedidosActivos(String clienteId) {
         return orderClient.getActiveOrders(clienteId);
@@ -40,6 +41,7 @@ public class GatewayService {
         aggregated.put("status", shipment.getStatus());
         aggregated.put("origin", shipment.getOrigin());
         aggregated.put("destination", shipment.getDestination());
+        aggregated.put("lastPosition", trackingPositionStore.findLatest(id).orElse(null));
 
         return aggregated;
     }

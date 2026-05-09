@@ -1,0 +1,97 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: logiflow-gateway
+  namespace: logiflow
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /graphql
+            pathType: Prefix
+            backend:
+              service:
+                name: graphql-gateway
+                port:
+                  number: 8080
+          - path: /graphiql
+            pathType: Prefix
+            backend:
+              service:
+                name: graphql-gateway
+                port:
+                  number: 8080
+          - path: /api/auth
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-auth
+                port:
+                  number: 8088
+          - path: /api/clients
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-clientes
+                port:
+                  number: 8086
+          - path: /api/corporate-accounts
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-clientes
+                port:
+                  number: 8086
+          - path: /api/orders
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-pedidos
+                port:
+                  number: 8087
+          - path: /api/shipments
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-ruteo
+                port:
+                  number: 8082
+          - path: /api/vehicles
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-flota-rest
+                port:
+                  number: 8081
+          - path: /api/drivers
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-flota-rest
+                port:
+                  number: 8081
+          - path: /api/invoices
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-facturacion
+                port:
+                  number: 8084
+          - path: /ws-tracking
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-seguimiento
+                port:
+                  number: 8083
+          - path: /ws
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-taller-soap
+                port:
+                  number: 8089

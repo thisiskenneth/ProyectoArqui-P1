@@ -41,4 +41,15 @@ type Envio {
     status: String
     origin: String
     destination: String
+    lastPosition: Position
+}
+
+type Position {
+    shipmentId: String
+    orderId: String
+    lat: Float
+    lng: Float
+    speed: Float
+    eta: String
+    timestamp: String
 }

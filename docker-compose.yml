@@ -69,8 +69,6 @@ services:
 
   ms-notificaciones:
     build: ./backend/ms-notificaciones
-    ports:
-      - "8085:8085"
     environment:
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
@@ -84,6 +82,9 @@ services:
     environment:
       SERVICES_ORDERS_URL: http://ms-pedidos:8087/api/orders
       SERVICES_SHIPMENTS_URL: http://ms-ruteo:8082/api/shipments
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
     depends_on:
+      - rabbitmq
       - ms-pedidos
       - ms-ruteo
