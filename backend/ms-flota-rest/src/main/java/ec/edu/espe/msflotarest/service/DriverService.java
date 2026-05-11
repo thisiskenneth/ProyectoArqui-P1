@@ -1,6 +1,7 @@
 package ec.edu.espe.msflotarest.service;
 
-import ec.edu.espe.msflotarest.dto.DriverDto;
+import ec.edu.espe.msflotarest.dto.request.DriverRequest;
+import ec.edu.espe.msflotarest.dto.response.DriverResponse;
 import ec.edu.espe.msflotarest.entity.Driver;
 import ec.edu.espe.msflotarest.repository.DriverRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,34 +15,34 @@ import java.util.stream.Collectors;
 public class DriverService {
     private final DriverRepository driverRepository;
 
-    public List<DriverDto> findAll() {
+    public List<DriverResponse> findAll() {
         return driverRepository.findAll().stream()
-                .map(this::convertToDto)
+                .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
 
-    public DriverDto findById(Long id) {
+    public DriverResponse findById(Long id) {
         return driverRepository.findById(id)
-                .map(this::convertToDto)
+                .map(this::convertToResponse)
                 .orElseThrow(() -> new RuntimeException("Driver not found with id: " + id));
     }
 
-    public DriverDto save(DriverDto dto) {
-        Driver driver = convertToEntity(dto);
-        return convertToDto(driverRepository.save(driver));
+    public DriverResponse save(DriverRequest request) {
+        Driver driver = convertToEntity(request);
+        return convertToResponse(driverRepository.save(driver));
     }
 
-    public DriverDto update(Long id, DriverDto dto) {
+    public DriverResponse update(Long id, DriverRequest request) {
         Driver driver = driverRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Driver not found with id: " + id));
         
-        driver.setFirstName(dto.getFirstName());
-        driver.setLastName(dto.getLastName());
-        driver.setLicenseNumber(dto.getLicenseNumber());
-        driver.setPhone(dto.getPhone());
-        driver.setAvailable(dto.getAvailable());
+        driver.setFirstName(request.getFirstName());
+        driver.setLastName(request.getLastName());
+        driver.setLicenseNumber(request.getLicenseNumber());
+        driver.setPhone(request.getPhone());
+        driver.setAvailable(request.getAvailable());
         
-        return convertToDto(driverRepository.save(driver));
+        return convertToResponse(driverRepository.save(driver));
     }
 
     public void delete(Long id) {
@@ -51,24 +52,24 @@ public class DriverService {
         driverRepository.deleteById(id);
     }
 
-    private DriverDto convertToDto(Driver entity) {
-        DriverDto dto = new DriverDto();
-        dto.setId(entity.getId());
-        dto.setFirstName(entity.getFirstName());
-        dto.setLastName(entity.getLastName());
-        dto.setLicenseNumber(entity.getLicenseNumber());
-        dto.setPhone(entity.getPhone());
-        dto.setAvailable(entity.getAvailable());
-        return dto;
+    private DriverResponse convertToResponse(Driver entity) {
+        DriverResponse response = new DriverResponse();
+        response.setId(entity.getId());
+        response.setFirstName(entity.getFirstName());
+        response.setLastName(entity.getLastName());
+        response.setLicenseNumber(entity.getLicenseNumber());
+        response.setPhone(entity.getPhone());
+        response.setAvailable(entity.getAvailable());
+        return response;
     }
 
-    private Driver convertToEntity(DriverDto dto) {
+    private Driver convertToEntity(DriverRequest request) {
         return Driver.builder()
-                .firstName(dto.getFirstName())
-                .lastName(dto.getLastName())
-                .licenseNumber(dto.getLicenseNumber())
-                .phone(dto.getPhone())
-                .available(dto.getAvailable())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .licenseNumber(request.getLicenseNumber())
+                .phone(request.getPhone())
+                .available(request.getAvailable())
                 .build();
     }
 }

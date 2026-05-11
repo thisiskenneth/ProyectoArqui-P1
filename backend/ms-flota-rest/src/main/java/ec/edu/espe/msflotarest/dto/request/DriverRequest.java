@@ -1,13 +1,11 @@
-package ec.edu.espe.msflotarest.dto;
+package ec.edu.espe.msflotarest.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class DriverDto {
-    private Long id;
-
+public class DriverRequest {
     @NotBlank(message = "First name is mandatory")
     private String firstName;
 

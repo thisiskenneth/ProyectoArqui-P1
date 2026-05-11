@@ -1,6 +1,7 @@
 package ec.edu.espe.msflotarest.controller;
 
-import ec.edu.espe.msflotarest.dto.DriverDto;
+import ec.edu.espe.msflotarest.dto.request.DriverRequest;
+import ec.edu.espe.msflotarest.dto.response.DriverResponse;
 import ec.edu.espe.msflotarest.service.DriverService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,23 +18,23 @@ public class DriverController {
     private final DriverService driverService;
 
     @GetMapping
-    public ResponseEntity<List<DriverDto>> getAll() {
+    public ResponseEntity<List<DriverResponse>> getAll() {
         return ResponseEntity.ok(driverService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DriverDto> getById(@PathVariable Long id) {
+    public ResponseEntity<DriverResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(driverService.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<DriverDto> create(@Valid @RequestBody DriverDto driverDto) {
-        return new ResponseEntity<>(driverService.save(driverDto), HttpStatus.CREATED);
+    public ResponseEntity<DriverResponse> create(@Valid @RequestBody DriverRequest request) {
+        return new ResponseEntity<>(driverService.save(request), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DriverDto> update(@PathVariable Long id, @Valid @RequestBody DriverDto driverDto) {
-        return ResponseEntity.ok(driverService.update(id, driverDto));
+    public ResponseEntity<DriverResponse> update(@PathVariable Long id, @Valid @RequestBody DriverRequest request) {
+        return ResponseEntity.ok(driverService.update(id, request));
     }
 
     @DeleteMapping("/{id}")

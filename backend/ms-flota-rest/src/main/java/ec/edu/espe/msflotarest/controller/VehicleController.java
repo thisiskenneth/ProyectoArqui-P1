@@ -1,6 +1,7 @@
 package ec.edu.espe.msflotarest.controller;
 
-import ec.edu.espe.msflotarest.dto.VehicleDto;
+import ec.edu.espe.msflotarest.dto.request.VehicleRequest;
+import ec.edu.espe.msflotarest.dto.response.VehicleResponse;
 import ec.edu.espe.msflotarest.service.VehicleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,28 +18,28 @@ public class VehicleController {
     private final VehicleService vehicleService;
 
     @GetMapping
-    public ResponseEntity<List<VehicleDto>> getAll() {
+    public ResponseEntity<List<VehicleResponse>> getAll() {
         return ResponseEntity.ok(vehicleService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<VehicleDto> getById(@PathVariable Long id) {
+    public ResponseEntity<VehicleResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(vehicleService.findById(id));
     }
 
     @GetMapping("/available")
-    public ResponseEntity<List<VehicleDto>> getAvailable() {
+    public ResponseEntity<List<VehicleResponse>> getAvailable() {
         return ResponseEntity.ok(vehicleService.findAvailable());
     }
 
     @PostMapping
-    public ResponseEntity<VehicleDto> create(@Valid @RequestBody VehicleDto vehicleDto) {
-        return new ResponseEntity<>(vehicleService.save(vehicleDto), HttpStatus.CREATED);
+    public ResponseEntity<VehicleResponse> create(@Valid @RequestBody VehicleRequest request) {
+        return new ResponseEntity<>(vehicleService.save(request), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<VehicleDto> update(@PathVariable Long id, @Valid @RequestBody VehicleDto vehicleDto) {
-        return ResponseEntity.ok(vehicleService.update(id, vehicleDto));
+    public ResponseEntity<VehicleResponse> update(@PathVariable Long id, @Valid @RequestBody VehicleRequest request) {
+        return ResponseEntity.ok(vehicleService.update(id, request));
     }
 
     @DeleteMapping("/{id}")

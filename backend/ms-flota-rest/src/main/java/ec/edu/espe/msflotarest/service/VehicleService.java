@@ -1,6 +1,7 @@
 package ec.edu.espe.msflotarest.service;
 
-import ec.edu.espe.msflotarest.dto.VehicleDto;
+import ec.edu.espe.msflotarest.dto.request.VehicleRequest;
+import ec.edu.espe.msflotarest.dto.response.VehicleResponse;
 import ec.edu.espe.msflotarest.entity.Vehicle;
 import ec.edu.espe.msflotarest.entity.VehicleStatus;
 import ec.edu.espe.msflotarest.repository.VehicleRepository;
@@ -15,34 +16,34 @@ import java.util.stream.Collectors;
 public class VehicleService {
     private final VehicleRepository vehicleRepository;
 
-    public List<VehicleDto> findAll() {
+    public List<VehicleResponse> findAll() {
         return vehicleRepository.findAll().stream()
-                .map(this::convertToDto)
+                .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
 
-    public VehicleDto findById(Long id) {
+    public VehicleResponse findById(Long id) {
         return vehicleRepository.findById(id)
-                .map(this::convertToDto)
+                .map(this::convertToResponse)
                 .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + id));
     }
 
-    public VehicleDto save(VehicleDto dto) {
-        Vehicle vehicle = convertToEntity(dto);
-        return convertToDto(vehicleRepository.save(vehicle));
+    public VehicleResponse save(VehicleRequest request) {
+        Vehicle vehicle = convertToEntity(request);
+        return convertToResponse(vehicleRepository.save(vehicle));
     }
 
-    public VehicleDto update(Long id, VehicleDto dto) {
+    public VehicleResponse update(Long id, VehicleRequest request) {
         Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + id));
         
-        vehicle.setPlate(dto.getPlate());
-        vehicle.setType(dto.getType());
-        vehicle.setCapacityKg(dto.getCapacityKg());
-        vehicle.setAutonomyKm(dto.getAutonomyKm());
-        vehicle.setStatus(dto.getStatus());
+        vehicle.setPlate(request.getPlate());
+        vehicle.setType(request.getType());
+        vehicle.setCapacityKg(request.getCapacityKg());
+        vehicle.setAutonomyKm(request.getAutonomyKm());
+        vehicle.setStatus(request.getStatus());
         
-        return convertToDto(vehicleRepository.save(vehicle));
+        return convertToResponse(vehicleRepository.save(vehicle));
     }
 
     public void delete(Long id) {
@@ -52,30 +53,30 @@ public class VehicleService {
         vehicleRepository.deleteById(id);
     }
 
-    public List<VehicleDto> findAvailable() {
+    public List<VehicleResponse> findAvailable() {
         return vehicleRepository.findByStatus(VehicleStatus.AVAILABLE).stream()
-                .map(this::convertToDto)
+                .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
 
-    private VehicleDto convertToDto(Vehicle entity) {
-        VehicleDto dto = new VehicleDto();
-        dto.setId(entity.getId());
-        dto.setPlate(entity.getPlate());
-        dto.setType(entity.getType());
-        dto.setCapacityKg(entity.getCapacityKg());
-        dto.setAutonomyKm(entity.getAutonomyKm());
-        dto.setStatus(entity.getStatus());
-        return dto;
+    private VehicleResponse convertToResponse(Vehicle entity) {
+        VehicleResponse response = new VehicleResponse();
+        response.setId(entity.getId());
+        response.setPlate(entity.getPlate());
+        response.setType(entity.getType());
+        response.setCapacityKg(entity.getCapacityKg());
+        response.setAutonomyKm(entity.getAutonomyKm());
+        response.setStatus(entity.getStatus());
+        return response;
     }
 
-    private Vehicle convertToEntity(VehicleDto dto) {
+    private Vehicle convertToEntity(VehicleRequest request) {
         return Vehicle.builder()
-                .plate(dto.getPlate())
-                .type(dto.getType())
-                .capacityKg(dto.getCapacityKg())
-                .autonomyKm(dto.getAutonomyKm())
-                .status(dto.getStatus())
+                .plate(request.getPlate())
+                .type(request.getType())
+                .capacityKg(request.getCapacityKg())
+                .autonomyKm(request.getAutonomyKm())
+                .status(request.getStatus())
                 .build();
     }
 }
