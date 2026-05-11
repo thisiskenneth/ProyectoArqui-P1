@@ -1,6 +1,7 @@
 package ec.edu.espe.msclientes.controller;
 
-import ec.edu.espe.msclientes.dto.ClientDto;
+import ec.edu.espe.msclientes.dto.request.ClientRequest;
+import ec.edu.espe.msclientes.dto.response.ClientResponse;
 import ec.edu.espe.msclientes.service.ClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,23 +18,23 @@ public class ClientController {
     private final ClientService clientService;
 
     @GetMapping
-    public ResponseEntity<List<ClientDto>> getAll() {
+    public ResponseEntity<List<ClientResponse>> getAll() {
         return ResponseEntity.ok(clientService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ClientDto> getById(@PathVariable Long id) {
+    public ResponseEntity<ClientResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(clientService.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<ClientDto> create(@Valid @RequestBody ClientDto clientDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(clientService.save(clientDto));
+    public ResponseEntity<ClientResponse> create(@Valid @RequestBody ClientRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(clientService.save(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ClientDto> update(@PathVariable Long id, @Valid @RequestBody ClientDto clientDto) {
-        return ResponseEntity.ok(clientService.update(id, clientDto));
+    public ResponseEntity<ClientResponse> update(@PathVariable Long id, @Valid @RequestBody ClientRequest request) {
+        return ResponseEntity.ok(clientService.update(id, request));
     }
 
     @DeleteMapping("/{id}")

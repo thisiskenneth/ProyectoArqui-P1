@@ -1,6 +1,7 @@
 package ec.edu.espe.msclientes.controller;
 
-import ec.edu.espe.msclientes.dto.CorporateAccountDto;
+import ec.edu.espe.msclientes.dto.request.CorporateAccountRequest;
+import ec.edu.espe.msclientes.dto.response.CorporateAccountResponse;
 import ec.edu.espe.msclientes.service.CorporateAccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +18,12 @@ public class CorporateAccountController {
     private final CorporateAccountService corporateAccountService;
 
     @GetMapping
-    public ResponseEntity<List<CorporateAccountDto>> getAll() {
+    public ResponseEntity<List<CorporateAccountResponse>> getAll() {
         return ResponseEntity.ok(corporateAccountService.findAll());
     }
 
     @PostMapping
-    public ResponseEntity<CorporateAccountDto> create(@Valid @RequestBody CorporateAccountDto dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(corporateAccountService.save(dto));
+    public ResponseEntity<CorporateAccountResponse> create(@Valid @RequestBody CorporateAccountRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(corporateAccountService.save(request));
     }
 }

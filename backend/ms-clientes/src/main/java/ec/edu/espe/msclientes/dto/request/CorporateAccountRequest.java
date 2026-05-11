@@ -1,13 +1,11 @@
-package ec.edu.espe.msclientes.dto;
+package ec.edu.espe.msclientes.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 @Data
-public class CorporateAccountDto {
-    private Long id;
-
+public class CorporateAccountRequest {
     @NotBlank(message = "RUC is mandatory")
     private String ruc;
 

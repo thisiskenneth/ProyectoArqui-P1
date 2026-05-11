@@ -1,6 +1,7 @@
 package ec.edu.espe.msclientes.service;
 
-import ec.edu.espe.msclientes.dto.CorporateAccountDto;
+import ec.edu.espe.msclientes.dto.request.CorporateAccountRequest;
+import ec.edu.espe.msclientes.dto.response.CorporateAccountResponse;
 import ec.edu.espe.msclientes.entity.CorporateAccount;
 import ec.edu.espe.msclientes.repository.CorporateAccountRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,33 +15,33 @@ import java.util.stream.Collectors;
 public class CorporateAccountService {
     private final CorporateAccountRepository corporateAccountRepository;
 
-    public List<CorporateAccountDto> findAll() {
+    public List<CorporateAccountResponse> findAll() {
         return corporateAccountRepository.findAll().stream()
-                .map(this::convertToDto)
+                .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
 
-    public CorporateAccountDto save(CorporateAccountDto dto) {
-        CorporateAccount ca = convertToEntity(dto);
-        return convertToDto(corporateAccountRepository.save(ca));
+    public CorporateAccountResponse save(CorporateAccountRequest request) {
+        CorporateAccount ca = convertToEntity(request);
+        return convertToResponse(corporateAccountRepository.save(ca));
     }
 
-    private CorporateAccountDto convertToDto(CorporateAccount entity) {
-        CorporateAccountDto dto = new CorporateAccountDto();
-        dto.setId(entity.getId());
-        dto.setRuc(entity.getRuc());
-        dto.setBusinessName(entity.getBusinessName());
-        dto.setCreditLimit(entity.getCreditLimit());
-        dto.setIndustry(entity.getIndustry());
-        return dto;
+    private CorporateAccountResponse convertToResponse(CorporateAccount entity) {
+        CorporateAccountResponse response = new CorporateAccountResponse();
+        response.setId(entity.getId());
+        response.setRuc(entity.getRuc());
+        response.setBusinessName(entity.getBusinessName());
+        response.setCreditLimit(entity.getCreditLimit());
+        response.setIndustry(entity.getIndustry());
+        return response;
     }
 
-    private CorporateAccount convertToEntity(CorporateAccountDto dto) {
+    private CorporateAccount convertToEntity(CorporateAccountRequest request) {
         return CorporateAccount.builder()
-                .ruc(dto.getRuc())
-                .businessName(dto.getBusinessName())
-                .creditLimit(dto.getCreditLimit())
-                .industry(dto.getIndustry())
+                .ruc(request.getRuc())
+                .businessName(request.getBusinessName())
+                .creditLimit(request.getCreditLimit())
+                .industry(request.getIndustry())
                 .build();
     }
 }

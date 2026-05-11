@@ -1,13 +1,11 @@
-package ec.edu.espe.msclientes.dto;
+package ec.edu.espe.msclientes.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class ClientDto {
-    private Long id;
-
+public class ClientRequest {
     @NotBlank(message = "First name is mandatory")
     private String firstName;
 
