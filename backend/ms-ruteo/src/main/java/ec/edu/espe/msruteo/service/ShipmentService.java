@@ -4,6 +4,7 @@ import ec.edu.espe.msruteo.client.FleetClient;
 import ec.edu.espe.msruteo.dto.AssignmentRequest;
 import ec.edu.espe.msruteo.dto.VehicleResponse;
 import ec.edu.espe.msruteo.dto.ShipmentEvent;
+import ec.edu.espe.msruteo.dto.response.ShipmentResponse;
 import ec.edu.espe.msruteo.entity.Shipment;
 import ec.edu.espe.msruteo.entity.ShipmentStatus;
 import ec.edu.espe.msruteo.publisher.EventPublisher;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,12 +26,12 @@ public class ShipmentService {
     private final FleetClient fleetClient;
     private final EventPublisher eventPublisher;
 
-    public Shipment assignShipment(AssignmentRequest request) {
+    public ShipmentResponse assignShipment(AssignmentRequest request) {
         log.info("Procesando asignación para pedido: {}", request.getOrderId());
 
         if (shipmentRepository.existsByOrderId(request.getOrderId())) {
             log.warn("El pedido {} ya tiene un envío asignado. Omitiendo.", request.getOrderId());
-            return shipmentRepository.findByOrderId(request.getOrderId()).get(0);
+            return convertToResponse(shipmentRepository.findByOrderId(request.getOrderId()).get(0));
         }
 
         // 1. Consultar vehículos disponibles en ms-flota-rest
@@ -66,19 +68,37 @@ public class ShipmentService {
 
         eventPublisher.publishShipmentAssigned(event);
 
-        return savedShipment;
+        return convertToResponse(savedShipment);
     }
 
-    public List<Shipment> findAll() {
-        return shipmentRepository.findAll();
+    public List<ShipmentResponse> findAll() {
+        return shipmentRepository.findAll().stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
     }
 
-    public Shipment findById(Long id) {
+    public ShipmentResponse findById(Long id) {
         return shipmentRepository.findById(id)
+                .map(this::convertToResponse)
                 .orElseThrow(() -> new RuntimeException("Shipment not found with id: " + id));
     }
 
-    public List<Shipment> findByOrderId(String orderId) {
-        return shipmentRepository.findByOrderId(orderId);
+    public List<ShipmentResponse> findByOrderId(String orderId) {
+        return shipmentRepository.findByOrderId(orderId).stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+
+    private ShipmentResponse convertToResponse(Shipment shipment) {
+        return ShipmentResponse.builder()
+                .id(shipment.getId())
+                .orderId(shipment.getOrderId())
+                .vehicleId(shipment.getVehicleId())
+                .vehiclePlate(shipment.getVehiclePlate())
+                .origin(shipment.getOrigin())
+                .destination(shipment.getDestination())
+                .status(shipment.getStatus())
+                .assignedAt(shipment.getAssignedAt())
+                .build();
     }
 }

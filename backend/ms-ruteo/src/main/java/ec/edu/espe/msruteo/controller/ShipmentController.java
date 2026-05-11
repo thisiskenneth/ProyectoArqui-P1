@@ -1,7 +1,7 @@
 package ec.edu.espe.msruteo.controller;
 
 import ec.edu.espe.msruteo.dto.AssignmentRequest;
-import ec.edu.espe.msruteo.entity.Shipment;
+import ec.edu.espe.msruteo.dto.response.ShipmentResponse;
 import ec.edu.espe.msruteo.service.ShipmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,22 +18,22 @@ public class ShipmentController {
     private final ShipmentService shipmentService;
 
     @PostMapping("/assign")
-    public ResponseEntity<Shipment> assign(@RequestBody AssignmentRequest request) {
+    public ResponseEntity<ShipmentResponse> assign(@RequestBody AssignmentRequest request) {
         return new ResponseEntity<>(shipmentService.assignShipment(request), HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<Shipment>> getAll() {
+    public ResponseEntity<List<ShipmentResponse>> getAll() {
         return ResponseEntity.ok(shipmentService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Shipment> getById(@PathVariable Long id) {
+    public ResponseEntity<ShipmentResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(shipmentService.findById(id));
     }
 
     @GetMapping("/order/{orderId}")
-    public ResponseEntity<List<Shipment>> getByOrderId(@PathVariable String orderId) {
+    public ResponseEntity<List<ShipmentResponse>> getByOrderId(@PathVariable String orderId) {
         return ResponseEntity.ok(shipmentService.findByOrderId(orderId));
     }
 }
