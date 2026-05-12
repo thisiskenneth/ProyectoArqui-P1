@@ -12,7 +12,7 @@ Backend distribuido para la plataforma LogiFlow, alineado con los microservicios
 | `ms-ruteo` | REST + RabbitMQ | Asignacion de pedidos a vehiculos y consulta de envios. |
 | `ms-seguimiento` | WebSockets + RabbitMQ | Consume posiciones y las retransmite en tiempo real. No expone REST. |
 | `ms-flota-rest` | REST | CRUD de vehiculos/conductores y disponibilidad para ruteo. |
-| `ms-taller-soap` | SOAP | Consulta de vehiculo y registro de ordenes de mantenimiento. |
+| `ms-taller` | REST | Consulta de vehiculo y registro de ordenes de mantenimiento. |
 | `ms-facturacion` | REST + RabbitMQ | Consume pedidos entregados y expone facturas. |
 | `ms-notificaciones` | RabbitMQ | Consume eventos y simula notificaciones por logs. No expone API externa. |
 | `graphql-gateway` | GraphQL + RabbitMQ | BFF GraphQL para pedidos, envios y ultima posicion conocida. |
@@ -38,7 +38,7 @@ docker compose ps -a
 Compilar todos los servicios:
 
 ```bash
-for service in ms-auth ms-clientes ms-flota-rest ms-taller-soap ms-pedidos ms-ruteo ms-seguimiento ms-facturacion ms-notificaciones graphql-gateway; do
+for service in ms-auth ms-clientes ms-flota-rest ms-taller ms-pedidos ms-ruteo ms-seguimiento ms-facturacion ms-notificaciones graphql-gateway; do
   (cd "backend/$service" && ./mvnw -DskipTests compile)
 done
 ```
@@ -46,7 +46,7 @@ done
 En Windows PowerShell:
 
 ```powershell
-$services = 'ms-auth','ms-clientes','ms-flota-rest','ms-taller-soap','ms-pedidos','ms-ruteo','ms-seguimiento','ms-facturacion','ms-notificaciones','graphql-gateway'
+$services = 'ms-auth','ms-clientes','ms-flota-rest','ms-taller','ms-pedidos','ms-ruteo','ms-seguimiento','ms-facturacion','ms-notificaciones','graphql-gateway'
 foreach ($service in $services) {
   Push-Location "backend\$service"
   .\mvnw.cmd -DskipTests compile
@@ -66,7 +66,7 @@ foreach ($service in $services) {
 | `ms-clientes` | `8086` |
 | `ms-pedidos` | `8087` |
 | `ms-auth` | `8088` |
-| `ms-taller-soap` | `8089` |
+| `ms-taller` | `8089` |
 | RabbitMQ AMQP | `5672` |
 | RabbitMQ Management | `15672` |
 
@@ -110,14 +110,14 @@ Facturacion:
 - `GET /api/invoices/{id}`
 - `GET /api/invoices/order/{orderId}`
 
-## SOAP
+## Taller Mantenimiento
 
-Servicio: `ms-taller-soap`
+Servicio: `ms-taller`
 
-- WSDL local: `http://localhost:8089/ws/maintenance.wsdl`
-- Operaciones:
-  - `consultarVehiculo(matricula)`
-  - `registrarOrdenMantenimiento(matricula, descripcion)`
+- Endpoint local: `http://localhost:8089/api/maintenance`
+- Operaciones REST:
+  - `GET /vehicles/{matricula}`
+  - `POST /orders`
 
 ## GraphQL
 
@@ -177,10 +177,9 @@ kubectl apply -f infrastructure/k8s/nginx-ingress.yaml
 ```
 
 El Ingress `logiflow-gateway` enruta:
-- REST: `/api/auth`, `/api/clients`, `/api/corporate-accounts`, `/api/orders`, `/api/shipments`, `/api/vehicles`, `/api/drivers`, `/api/invoices`.
+- REST: `/api/auth`, `/api/clients`, `/api/corporate-accounts`, `/api/orders`, `/api/shipments`, `/api/vehicles`, `/api/drivers`, `/api/invoices`, `/api/maintenance`.
 - GraphQL: `/graphql`, `/graphiql`.
 - WebSockets: `/ws-tracking`.
-- SOAP: `/ws`.
 
 ## CI/CD
 

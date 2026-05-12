@@ -1,6 +1,7 @@
 package ec.edu.espe.msruteo.service;
 
 import ec.edu.espe.msruteo.client.FleetClient;
+import ec.edu.espe.msruteo.client.TallerClient;
 import ec.edu.espe.msruteo.dto.AssignmentRequest;
 import ec.edu.espe.msruteo.dto.VehicleResponse;
 import ec.edu.espe.msruteo.dto.ShipmentEvent;
@@ -24,6 +25,7 @@ public class ShipmentService {
 
     private final ShipmentRepository shipmentRepository;
     private final FleetClient fleetClient;
+    private final TallerClient tallerClient;
     private final EventPublisher eventPublisher;
 
     public ShipmentResponse assignShipment(AssignmentRequest request) {
@@ -67,6 +69,12 @@ public class ShipmentService {
                 .build();
 
         eventPublisher.publishShipmentAssigned(event);
+
+        // 5. Simulación de Fase 3: Probabilidad del 30% de solicitar mantenimiento preventivo
+        if (Math.random() < 0.3) {
+            log.info("Simulación Fase 3: El vehículo {} requiere mantenimiento preventivo. Notificando a taller...", vehicle.getPlate());
+            tallerClient.requestMaintenance(vehicle.getPlate(), "Mantenimiento preventivo sugerido tras asignación de envío.");
+        }
 
         return convertToResponse(savedShipment);
     }

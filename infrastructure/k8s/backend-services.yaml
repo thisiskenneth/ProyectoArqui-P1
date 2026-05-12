@@ -103,21 +103,21 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ms-taller-soap
+  name: ms-taller
   namespace: logiflow
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ms-taller-soap
+      app: ms-taller
   template:
     metadata:
       labels:
-        app: ms-taller-soap
+        app: ms-taller
     spec:
       containers:
-        - name: ms-taller-soap
-          image: proyecto-ms-taller-soap:latest
+        - name: ms-taller
+          image: proyecto-ms-taller:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8089
@@ -125,11 +125,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ms-taller-soap
+  name: ms-taller
   namespace: logiflow
 spec:
   selector:
-    app: ms-taller-soap
+    app: ms-taller
   ports:
     - port: 8089
       targetPort: 8089
@@ -201,6 +201,8 @@ spec:
               value: "5672"
             - name: FLEET_SERVICE_URL
               value: http://ms-flota-rest:8081/api/vehicles/available
+            - name: TALLER_SERVICE_URL
+              value: http://ms-taller:8089/api/maintenance
 ---
 apiVersion: v1
 kind: Service

@@ -88,10 +88,10 @@ spec:
                 name: ms-seguimiento
                 port:
                   number: 8083
-          - path: /ws
+          - path: /api/maintenance
             pathType: Prefix
             backend:
               service:
-                name: ms-taller-soap
+                name: ms-taller
                 port:
                   number: 8089

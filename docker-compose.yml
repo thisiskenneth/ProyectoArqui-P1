@@ -20,8 +20,8 @@ services:
     ports:
       - "8081:8081"
 
-  ms-taller-soap:
-    build: ./backend/ms-taller-soap
+  ms-taller:
+    build: ./backend/ms-taller
     ports:
       - "8089:8089"
 
@@ -43,6 +43,7 @@ services:
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       FLEET_SERVICE_URL: http://ms-flota-rest:8081/api/vehicles/available
+      TALLER_SERVICE_URL: http://ms-taller:8089/api/maintenance
     depends_on:
       - rabbitmq
       - ms-flota-rest
@@ -88,3 +89,20 @@ services:
       - rabbitmq
       - ms-pedidos
       - ms-ruteo
+
+  api-gateway:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./infrastructure/docker/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - ms-auth
+      - ms-clientes
+      - ms-flota-rest
+      - ms-taller
+      - ms-pedidos
+      - ms-ruteo
+      - ms-seguimiento
+      - ms-facturacion
+      - graphql-gateway

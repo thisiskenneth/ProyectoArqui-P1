@@ -40,7 +40,7 @@ jobs:
             ms-auth \
             ms-clientes \
             ms-flota-rest \
-            ms-taller-soap \
+            ms-taller \
             ms-pedidos \
             ms-ruteo \
             ms-seguimiento \
@@ -62,7 +62,7 @@ jobs:
             -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
             -Dsonar.organization=${{ env.SONAR_ORGANIZATION }}
             -Dsonar.sources=backend
-            -Dsonar.java.binaries=backend/ms-auth/target/classes,backend/ms-clientes/target/classes,backend/ms-flota-rest/target/classes,backend/ms-taller-soap/target/classes,backend/ms-pedidos/target/classes,backend/ms-ruteo/target/classes,backend/ms-seguimiento/target/classes,backend/ms-facturacion/target/classes,backend/ms-notificaciones/target/classes,backend/graphql-gateway/target/classes
+            -Dsonar.java.binaries=backend/ms-auth/target/classes,backend/ms-clientes/target/classes,backend/ms-flota-rest/target/classes,backend/ms-taller/target/classes,backend/ms-pedidos/target/classes,backend/ms-ruteo/target/classes,backend/ms-seguimiento/target/classes,backend/ms-facturacion/target/classes,backend/ms-notificaciones/target/classes,backend/graphql-gateway/target/classes
 
       - name: Notify Telegram
         if: always()
