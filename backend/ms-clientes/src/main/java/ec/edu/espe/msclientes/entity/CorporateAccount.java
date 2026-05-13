@@ -17,7 +17,7 @@ public class CorporateAccount {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "uuid")
+    @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
     /** RUC ecuatoriano: exactamente 13 dígitos */

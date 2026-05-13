@@ -21,7 +21,7 @@ public class Person {
 
     /** UUID compartido con User (PK y FK a la vez) */
     @Id
-    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "uuid")
+    @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY)
