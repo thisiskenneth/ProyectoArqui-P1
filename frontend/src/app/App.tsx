@@ -1,3 +1,4 @@
+// frontend/src/app/App.tsx
 import type { FormEvent } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { AvailabilityPanel } from "../features/fleet/components/AvailabilityPanel";
