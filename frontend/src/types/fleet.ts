@@ -1,16 +1,17 @@
 export type VehicleStatus = "AVAILABLE" | "MAINTENANCE" | "BUSY" | "INACTIVE";
+export type VehicleType = "Moto" | "Auto" | "Furgoneta" | "Camion";
 
 export interface Vehicle {
-  id?: number;
+  id?: string;
   plate: string;
-  type: string;
+  type: VehicleType;
   capacityKg: number;
   autonomyKm: number;
   status: VehicleStatus;
 }
 
 export interface Driver {
-  id?: number;
+  id?: string;
   firstName: string;
   lastName: string;
   licenseNumber: string;

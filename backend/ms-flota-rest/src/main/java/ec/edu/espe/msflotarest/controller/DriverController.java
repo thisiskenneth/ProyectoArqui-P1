@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/drivers")
@@ -22,7 +23,7 @@ public class DriverController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DriverDto> getById(@PathVariable Long id) {
+    public ResponseEntity<DriverDto> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(driverService.findById(id));
     }
 
@@ -37,13 +38,13 @@ public class DriverController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DriverDto> update(@PathVariable Long id, @Valid @RequestBody DriverDto driverDto) {
+    public ResponseEntity<DriverDto> update(@PathVariable UUID id, @Valid @RequestBody DriverDto driverDto) {
         return ResponseEntity.ok(driverService.update(id, driverDto));
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable UUID id) {
         driverService.delete(id);
     }
 }

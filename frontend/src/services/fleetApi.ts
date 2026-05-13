@@ -15,7 +15,7 @@ export async function saveVehicle(vehicle: Vehicle): Promise<Vehicle> {
   return readJson<Vehicle>(response);
 }
 
-export async function deleteVehicle(id: number): Promise<void> {
+export async function deleteVehicle(id: string): Promise<void> {
   const response = await fetch(`/api/vehicles/${id}`, { method: "DELETE" });
   if (!response.ok) {
     throw new Error(await response.text());
@@ -36,7 +36,7 @@ export async function saveDriver(driver: Driver): Promise<Driver> {
   return readJson<Driver>(response);
 }
 
-export async function deleteDriver(id: number): Promise<void> {
+export async function deleteDriver(id: string): Promise<void> {
   const response = await fetch(`/api/drivers/${id}`, { method: "DELETE" });
   if (!response.ok) {
     throw new Error(await response.text());

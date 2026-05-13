@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,33 +22,42 @@ public class VehicleService {
                 .collect(Collectors.toList());
     }
 
-    public VehicleDto findById(Long id) {
+    public VehicleDto findById(UUID id) {
         return vehicleRepository.findById(id)
                 .map(this::convertToDto)
-                .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("Vehículo no encontrado con id: " + id));
     }
 
     public VehicleDto save(VehicleDto dto) {
+        if (vehicleRepository.existsByPlate(dto.getPlate())) {
+            throw new IllegalArgumentException("Ya existe un vehículo con la matrícula: " + dto.getPlate());
+        }
         Vehicle vehicle = convertToEntity(dto);
         return convertToDto(vehicleRepository.save(vehicle));
     }
 
-    public VehicleDto update(Long id, VehicleDto dto) {
+    public VehicleDto update(UUID id, VehicleDto dto) {
         Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + id));
-        
+                .orElseThrow(() -> new RuntimeException("Vehículo no encontrado con id: " + id));
+
+        vehicleRepository.findByPlate(dto.getPlate()).ifPresent(existing -> {
+            if (!existing.getId().equals(id)) {
+                throw new IllegalArgumentException("Ya existe otro vehículo con la matrícula: " + dto.getPlate());
+            }
+        });
+
         vehicle.setPlate(dto.getPlate());
         vehicle.setType(dto.getType());
         vehicle.setCapacityKg(dto.getCapacityKg());
         vehicle.setAutonomyKm(dto.getAutonomyKm());
         vehicle.setStatus(dto.getStatus());
-        
+
         return convertToDto(vehicleRepository.save(vehicle));
     }
 
-    public void delete(Long id) {
+    public void delete(UUID id) {
         if (!vehicleRepository.existsById(id)) {
-            throw new RuntimeException("Vehicle not found with id: " + id);
+            throw new RuntimeException("Vehículo no encontrado con id: " + id);
         }
         vehicleRepository.deleteById(id);
     }

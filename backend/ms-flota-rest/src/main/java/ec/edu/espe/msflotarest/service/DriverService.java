@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,33 +21,36 @@ public class DriverService {
                 .collect(Collectors.toList());
     }
 
-    public DriverDto findById(Long id) {
+    public DriverDto findById(UUID id) {
         return driverRepository.findById(id)
                 .map(this::convertToDto)
-                .orElseThrow(() -> new RuntimeException("Driver not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("Conductor no encontrado con id: " + id));
     }
 
     public DriverDto save(DriverDto dto) {
+        if (driverRepository.existsByLicenseNumber(dto.getLicenseNumber())) {
+            throw new IllegalArgumentException("Ya existe un conductor con la licencia: " + dto.getLicenseNumber());
+        }
         Driver driver = convertToEntity(dto);
         return convertToDto(driverRepository.save(driver));
     }
 
-    public DriverDto update(Long id, DriverDto dto) {
+    public DriverDto update(UUID id, DriverDto dto) {
         Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Driver not found with id: " + id));
-        
+                .orElseThrow(() -> new RuntimeException("Conductor no encontrado con id: " + id));
+
         driver.setFirstName(dto.getFirstName());
         driver.setLastName(dto.getLastName());
         driver.setLicenseNumber(dto.getLicenseNumber());
         driver.setPhone(dto.getPhone());
         driver.setAvailable(dto.getAvailable());
-        
+
         return convertToDto(driverRepository.save(driver));
     }
 
-    public void delete(Long id) {
+    public void delete(UUID id) {
         if (!driverRepository.existsById(id)) {
-            throw new RuntimeException("Driver not found with id: " + id);
+            throw new RuntimeException("Conductor no encontrado con id: " + id);
         }
         driverRepository.deleteById(id);
     }

@@ -3,6 +3,8 @@ package ec.edu.espe.msflotarest.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "drivers")
 @Getter
@@ -12,8 +14,8 @@ import lombok.*;
 @Builder
 public class Driver {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(nullable = false)
     private String firstName;

@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/vehicles")
@@ -22,7 +23,7 @@ public class VehicleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<VehicleDto> getById(@PathVariable Long id) {
+    public ResponseEntity<VehicleDto> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(vehicleService.findById(id));
     }
 
@@ -37,13 +38,13 @@ public class VehicleController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<VehicleDto> update(@PathVariable Long id, @Valid @RequestBody VehicleDto vehicleDto) {
+    public ResponseEntity<VehicleDto> update(@PathVariable UUID id, @Valid @RequestBody VehicleDto vehicleDto) {
         return ResponseEntity.ok(vehicleService.update(id, vehicleDto));
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable UUID id) {
         vehicleService.delete(id);
     }
 }

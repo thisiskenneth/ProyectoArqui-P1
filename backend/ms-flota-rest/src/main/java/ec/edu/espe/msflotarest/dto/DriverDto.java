@@ -1,24 +1,29 @@
 package ec.edu.espe.msflotarest.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.Data;
+
+import java.util.UUID;
 
 @Data
 public class DriverDto {
-    private Long id;
+    private UUID id;
 
-    @NotBlank(message = "First name is mandatory")
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(min = 2, max = 50, message = "El nombre debe tener entre 2 y 50 caracteres")
     private String firstName;
 
-    @NotBlank(message = "Last name is mandatory")
+    @NotBlank(message = "El apellido es obligatorio")
+    @Size(min = 2, max = 50, message = "El apellido debe tener entre 2 y 50 caracteres")
     private String lastName;
 
-    @NotBlank(message = "License number is mandatory")
+    @NotBlank(message = "El número de licencia es obligatorio")
+    @Size(min = 5, max = 30, message = "La licencia debe tener entre 5 y 30 caracteres")
     private String licenseNumber;
 
+    @Pattern(regexp = "^(\\+?[0-9\\-\\s]{7,20})?$", message = "Formato de teléfono inválido")
     private String phone;
 
-    @NotNull(message = "Availability status is mandatory")
+    @NotNull(message = "El estado de disponibilidad es obligatorio")
     private Boolean available;
 }
