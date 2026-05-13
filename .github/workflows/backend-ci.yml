@@ -1,0 +1,132 @@
+name: Phase 1 CI
+
+on:
+  push:
+    branches:
+      - main
+      - development
+  pull_request:
+    branches:
+      - main
+      - development
+
+jobs:
+  phase-1-services:
+    name: Validate Phase 1 services
+    runs-on: ubuntu-latest
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+      SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate required external configuration
+        run: |
+          set -e
+          missing=0
+          for name in SONAR_TOKEN SONAR_PROJECT_KEY SONAR_ORGANIZATION TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error title=Missing secret::$name is required for the Phase 1 CI pipeline."
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            echo "Configure the missing repository secrets in GitHub: Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Compile and test ms-flota-rest
+        run: |
+          chmod +x backend/ms-flota-rest/mvnw
+          cd backend/ms-flota-rest
+          ./mvnw -B test
+
+      - name: Compile and test ms-taller-rest
+        run: |
+          chmod +x backend/ms-taller-soap/mvnw
+          cd backend/ms-taller-soap
+          ./mvnw -B test
+
+      - name: SonarCloud analysis
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ env.SONAR_ORGANIZATION }}
+
+      - name: Collect SonarCloud summary
+        if: always()
+        run: |
+          set +e
+          echo "SonarCloud summary unavailable" > sonar-summary.txt
+
+          if [ -z "$SONAR_TOKEN" ] || [ -z "$SONAR_PROJECT_KEY" ]; then
+            echo "Missing SonarCloud secrets" > sonar-summary.txt
+            exit 0
+          fi
+
+          curl -sS -u "${SONAR_TOKEN}:" \
+            "https://sonarcloud.io/api/measures/component?component=${SONAR_PROJECT_KEY}&metricKeys=bugs,vulnerabilities,code_smells,coverage" \
+            -o sonar-measures.json
+
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("sonar-measures.json")
+          if not path.exists():
+              Path("sonar-summary.txt").write_text("SonarCloud summary unavailable", encoding="utf-8")
+              raise SystemExit(0)
+
+          try:
+              payload = json.loads(path.read_text(encoding="utf-8"))
+              measures = {
+                  item["metric"]: item.get("value", "N/A")
+                  for item in payload.get("component", {}).get("measures", [])
+              }
+              summary = (
+                  f"Bugs: {measures.get('bugs', 'N/A')} | "
+                  f"Vulnerabilities: {measures.get('vulnerabilities', 'N/A')} | "
+                  f"Code smells: {measures.get('code_smells', 'N/A')} | "
+                  f"Coverage: {measures.get('coverage', 'N/A')}%"
+              )
+          except Exception as exc:
+              summary = f"SonarCloud summary unavailable ({exc})"
+
+          Path("sonar-summary.txt").write_text(summary, encoding="utf-8")
+          PY
+
+      - name: Notify Telegram
+        if: always()
+        run: |
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "::error title=Missing Telegram secrets::TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID are required."
+            exit 1
+          fi
+
+          STATUS="${{ job.status }}"
+          SHORT_SHA="$(echo "${{ github.sha }}" | cut -c1-8)"
+          SONAR_SUMMARY="$(cat sonar-summary.txt 2>/dev/null || echo 'SonarCloud summary unavailable')"
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          TEXT="LogiFlow Fase 1 CI: ${STATUS}%0AWorkflow: ${{ github.workflow }}%0AJob: phase-1-services%0ABranch: ${{ github.ref_name }}%0ACommit: ${SHORT_SHA}%0AActor: ${{ github.actor }}%0AComponentes: ms-flota-rest, ms-taller-rest%0ASonar: ${SONAR_SUMMARY}%0ARun: ${RUN_URL}"
+
+          curl -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=${TEXT}"

@@ -1,36 +1,54 @@
-version: '3.8'
-
 services:
-  ms-auth:
-    build: ./backend/ms-auth
-    ports:
-      - "3001:3001"
+  db-flota:
+    image: postgres:15-alpine
+    container_name: db-flota
     environment:
-      - NODE_ENV=development
-
-  ms-clientes:
-    build: ./backend/ms-clientes
+      POSTGRES_DB: flotadb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - "3002:3002"
+      - "5432:5432"
+    volumes:
+      - pgdata-flota:/var/lib/postgresql/data
 
-  ms-pedidos:
-    build: ./backend/ms-pedidos
+  db-taller:
+    image: postgres:15-alpine
+    container_name: db-taller
+    environment:
+      POSTGRES_DB: tallerdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - "3003:3003"
+      - "5433:5432"
+    volumes:
+      - pgdata-taller:/var/lib/postgresql/data
 
-  ms-ruteo:
-    build: ./backend/ms-ruteo
+  ms-flota-rest:
+    build: ./backend/ms-flota-rest
+    container_name: ms-flota-rest
     ports:
-      - "3004:3004"
+      - "8081:8081"
+    environment:
+      DB_URL: jdbc:postgresql://db-flota:5432/flotadb
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      TALLER_API_URL: http://ms-taller-rest:8089/api
+    depends_on:
+      - db-flota
+      - ms-taller-rest
 
-  ms-seguimiento:
-    build: ./backend/ms-seguimiento
+  ms-taller-rest:
+    build: ./backend/ms-taller-soap
+    container_name: ms-taller-rest
     ports:
-      - "3005:3005"
+      - "8089:8089"
+    environment:
+      DB_URL: jdbc:postgresql://db-taller:5432/tallerdb
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+    depends_on:
+      - db-taller
 
-  graphql-gateway:
-    build: ./backend/graphql-gateway
-    ports:
-      - "4000:4000"
-
-  # Add other services as needed
+volumes:
+  pgdata-flota:
+  pgdata-taller:

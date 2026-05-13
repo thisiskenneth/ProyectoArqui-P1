@@ -2,7 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
-      <profile name="Annotation profile for ms-auth" enabled="true">
+      <profile name="Annotation profile for ms-taller-rest" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -10,26 +10,20 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
         </processorPath>
-        <module name="ms-seguimiento" />
-        <module name="ms-ruteo" />
-        <module name="ms-auth" />
-        <module name="ms-notificaciones" />
         <module name="ms-flota-rest" />
-        <module name="ms-facturacion" />
-        <module name="graphql-gateway" />
-      </profile>
-      <profile name="Annotation profile for ms-clientes" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
-        </processorPath>
-        <module name="ms-clientes" />
         <module name="ms-taller-soap" />
-        <module name="ms-pedidos" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="graphql-gateway" target="21" />
+      <module name="ms-auth" target="21" />
+      <module name="ms-clientes" target="21" />
+      <module name="ms-facturacion" target="21" />
+      <module name="ms-notificaciones" target="21" />
+      <module name="ms-pedidos" target="21" />
+      <module name="ms-ruteo" target="21" />
+      <module name="ms-seguimiento" target="21" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
