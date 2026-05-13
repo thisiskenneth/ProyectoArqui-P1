@@ -1,36 +1,33 @@
 import { useState } from 'react';
-import { gql, useQuery } from '@apollo/client';
 import { api } from '../lib/api';
 import { FileText, Package } from 'lucide-react';
-
-const PEDIDOS_CLIENTE = gql`
-  query PedidosCliente($clienteId: String!) {
-    pedidosActivos(clienteId: $clienteId) {
-      id
-      origin
-      destination
-      status
-    }
-  }
-`;
 
 export default function ClientPanel() {
   const [email, setEmail] = useState('admin@logiflow.com');
   const [searchedEmail, setSearchedEmail] = useState('');
   
-  const { data, loading, refetch } = useQuery(PEDIDOS_CLIENTE, {
-    variables: { clienteId: searchedEmail },
-    skip: !searchedEmail,
-    errorPolicy: 'ignore'
-  });
-
+  const [pedidos, setPedidos] = useState<any[]>([]);
+  const [loadingPedidos, setLoadingPedidos] = useState(false);
   const [invoices, setInvoices] = useState<any[]>([]);
   const [loadingInvoices, setLoadingInvoices] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setSearchedEmail(email);
+    fetchPedidos(email);
     fetchInvoices(email);
+  };
+
+  const fetchPedidos = async (clientEmail: string) => {
+    setLoadingPedidos(true);
+    try {
+      const res = await api.get(`/gateway/pedidos?clienteId=${clientEmail}`);
+      setPedidos(res.data);
+    } catch (err) {
+      console.error('Error fetching pedidos', err);
+    } finally {
+      setLoadingPedidos(false);
+    }
   };
 
   const fetchInvoices = async (clientEmail: string) => {
@@ -68,12 +65,12 @@ export default function ClientPanel() {
           {/* Historial de Pedidos */}
           <div className="glass-panel">
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-              <Package color="var(--accent-primary)"/> Mis Pedidos (GraphQL)
+              <Package color="var(--accent-primary)"/> Mis Pedidos (REST API)
             </h2>
             
-            {loading ? <p>Cargando pedidos...</p> : data?.pedidosActivos?.length > 0 ? (
+            {loadingPedidos ? <p>Cargando pedidos...</p> : pedidos.length > 0 ? (
               <div className="grid-layout" style={{ gap: '1rem' }}>
-                {data.pedidosActivos.map((pedido: any) => (
+                {pedidos.map((pedido: any) => (
                   <div key={pedido.id} style={{ padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '8px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                       <strong>{pedido.id}</strong>

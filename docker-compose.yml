@@ -76,8 +76,8 @@ services:
     depends_on:
       - rabbitmq
 
-  graphql-gateway:
-    build: ./backend/graphql-gateway
+  gateway:
+    build: ./backend/gateway
     ports:
       - "8080:8080"
     environment:
@@ -105,4 +105,4 @@ services:
       - ms-ruteo
       - ms-seguimiento
       - ms-facturacion
-      - graphql-gateway
+      - gateway

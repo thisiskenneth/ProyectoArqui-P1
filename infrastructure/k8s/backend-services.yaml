@@ -322,21 +322,21 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: graphql-gateway
+  name: gateway
   namespace: logiflow
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: graphql-gateway
+      app: gateway
   template:
     metadata:
       labels:
-        app: graphql-gateway
+        app: gateway
     spec:
       containers:
-        - name: graphql-gateway
-          image: proyecto-graphql-gateway:latest
+        - name: gateway
+          image: proyecto-gateway:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -353,11 +353,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: graphql-gateway
+  name: gateway
   namespace: logiflow
 spec:
   selector:
-    app: graphql-gateway
+    app: gateway
   ports:
     - port: 8080
       targetPort: 8080

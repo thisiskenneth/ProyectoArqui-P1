@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
-import { Truck, Wrench } from 'lucide-react';
+import { Truck, Wrench, BarChart3, CheckCircle, AlertTriangle } from 'lucide-react';
 
 export default function FleetPanel() {
   const [vehicles, setVehicles] = useState<any[]>([]);
@@ -76,8 +76,39 @@ export default function FleetPanel() {
     }
   };
 
+  // Derived stats
+  const totalVehicles = vehicles.length;
+  const availableVehicles = vehicles.filter(v => v.status === 'AVAILABLE').length;
+  const maintenanceVehicles = vehicles.filter(v => v.status !== 'AVAILABLE').length;
+
   return (
-    <div className="grid-layout grid-cols-2">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+      {/* Dashboard Stats */}
+      <div className="glass-panel" style={{ padding: '1.5rem' }}>
+        <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem 0' }}>
+          <BarChart3 color="var(--accent-secondary)"/> Dashboard de Flota
+        </h2>
+        <div className="grid-layout grid-cols-3" style={{ gap: '1rem' }}>
+          <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1.5rem', borderRadius: '12px', textAlign: 'center', border: '1px solid var(--glass-border)' }}>
+            <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-secondary)' }}>Total Vehículos</h3>
+            <p style={{ fontSize: '2.5rem', fontWeight: 'bold', margin: 0, color: 'var(--text-primary)' }}>{totalVehicles}</p>
+          </div>
+          <div style={{ background: 'rgba(var(--success-rgb),0.1)', padding: '1.5rem', borderRadius: '12px', textAlign: 'center', border: '1px solid var(--success)' }}>
+            <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--success)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+              <CheckCircle size={18}/> Disponibles
+            </h3>
+            <p style={{ fontSize: '2.5rem', fontWeight: 'bold', margin: 0, color: 'var(--success)' }}>{availableVehicles}</p>
+          </div>
+          <div style={{ background: 'rgba(var(--warning-rgb),0.1)', padding: '1.5rem', borderRadius: '12px', textAlign: 'center', border: '1px solid var(--warning)' }}>
+            <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--warning)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+              <AlertTriangle size={18}/> En Taller
+            </h3>
+            <p style={{ fontSize: '2.5rem', fontWeight: 'bold', margin: 0, color: 'var(--warning)' }}>{maintenanceVehicles}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid-layout grid-cols-2">
       {/* Flota Actual */}
       <div className="glass-panel">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
@@ -165,6 +196,7 @@ export default function FleetPanel() {
           </button>
         </form>
       </div>
+    </div>
     </div>
   );
 }

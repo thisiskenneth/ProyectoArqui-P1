@@ -11,18 +11,11 @@ spec:
   rules:
     - http:
         paths:
-          - path: /graphql
+          - path: /api/gateway
             pathType: Prefix
             backend:
               service:
-                name: graphql-gateway
-                port:
-                  number: 8080
-          - path: /graphiql
-            pathType: Prefix
-            backend:
-              service:
-                name: graphql-gateway
+                name: gateway
                 port:
                   number: 8080
           - path: /api/auth

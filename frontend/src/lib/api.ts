@@ -1,11 +1,15 @@
 import axios from 'axios';
 
-// Usamos el proxy de Vite para evitar CORS
-const API_URL = '/api';
-
 export const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: '/api',
+  headers: { 'Content-Type': 'application/json' },
+});
+
+// Inyecta el token JWT en cada petición automáticamente
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });

@@ -9,7 +9,6 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': 'http://localhost',
-      '/graphql': 'http://localhost',
       '/ws-tracking': {
         target: 'http://localhost',
         ws: true

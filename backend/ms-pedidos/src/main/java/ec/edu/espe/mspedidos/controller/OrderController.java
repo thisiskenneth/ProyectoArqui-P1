@@ -10,11 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
 public class OrderController {
+
     private final OrderService orderService;
 
     @GetMapping
@@ -23,7 +25,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponse> getById(@PathVariable Long id) {
+    public ResponseEntity<OrderResponse> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(orderService.findById(id));
     }
 
@@ -38,12 +40,12 @@ public class OrderController {
     }
 
     @PostMapping("/{id}/cancel")
-    public ResponseEntity<OrderResponse> cancel(@PathVariable Long id) {
+    public ResponseEntity<OrderResponse> cancel(@PathVariable UUID id) {
         return ResponseEntity.ok(orderService.cancel(id));
     }
 
     @PostMapping("/{id}/deliver")
-    public ResponseEntity<OrderResponse> deliver(@PathVariable Long id) {
+    public ResponseEntity<OrderResponse> deliver(@PathVariable UUID id) {
         return ResponseEntity.ok(orderService.markAsDelivered(id));
     }
 }

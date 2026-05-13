@@ -12,7 +12,8 @@ import java.util.Set;
 @Component
 public class JwtUtil {
 
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private final String secret = "eW91cnN1cGVyc2VjcmV0a2V5eW91cnN1cGVyc2VjcmV0a2V5eW91cnN1cGVyc2VjcmV0a2V5";
+    private final Key key = Keys.hmacShaKeyFor(io.jsonwebtoken.io.Decoders.BASE64.decode(secret));
     private final long expiration = 86400000; // 24h
 
     public String generateToken(String username, Set<String> roles) {
