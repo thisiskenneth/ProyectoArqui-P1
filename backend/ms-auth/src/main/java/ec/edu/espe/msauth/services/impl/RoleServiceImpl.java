@@ -83,7 +83,7 @@ public class RoleServiceImpl implements RoleService {
                 .orElseThrow(() -> new EntityNotFoundException("Rol no encontrado con id: " + id));
 
         // Regla de negocio: no eliminar rol si tiene usuarios asignados
-        if (!userRoleRepository.findByUserId(id).isEmpty()) {
+        if (!userRoleRepository.findByRoleId(id).isEmpty()) {
             throw new IllegalStateException(
                 "No se puede eliminar el rol '" + role.getName() + "' porque tiene usuarios asignados.");
         }

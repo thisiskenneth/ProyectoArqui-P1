@@ -2,7 +2,6 @@ package ec.edu.espe.msauth.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,23 +24,19 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Auth público (login, register, verify)
+                // Auth público
                 .requestMatchers("/api/auth/**").permitAll()
-                // CRUD de usuarios y roles (en producción proteger con roles ADMIN)
-                .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/roles/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/roles").permitAll()
+                // CRUD completo de usuarios y roles — todos los métodos
+                .requestMatchers("/api/users/**").permitAll()
+                .requestMatchers("/api/roles/**").permitAll()
                 // OpenAPI / Swagger
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                // H2 Console (solo desarrollo)
+                // H2 Console (solo dev)
                 .requestMatchers("/h2-console/**").permitAll()
                 .anyRequest().authenticated()
             );
 
-        // Allow H2 console frames (dev only)
         http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
-
         return http.build();
     }
 }

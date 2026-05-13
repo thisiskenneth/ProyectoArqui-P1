@@ -15,9 +15,11 @@ import ec.edu.espe.msauth.repository.UserRoleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -56,7 +58,7 @@ public class UserServiceImpl {
 
     @Transactional
     public UserResponse create(UserCreateRequest request) {
-        // Validaciones de unicidad
+        // Validaciones de unicidad de email
         if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
             throw new IllegalStateException("El email '" + request.getEmail() + "' ya está registrado.");
         }
@@ -66,23 +68,27 @@ public class UserServiceImpl {
             throw new IllegalStateException("No está permitido crear usuarios con rol ADMIN desde este endpoint.");
         }
 
-        // Buscar rol
+        // Buscar rol (case-insensitive: "cliente" == "CLIENTE")
         RoleEntity role = roleRepository.findByNameIgnoreCase(request.getRoleName())
-                .orElseThrow(() -> new EntityNotFoundException("Rol no encontrado: " + request.getRoleName()));
+                .orElseThrow(() -> new EntityNotFoundException(
+                    "Rol no encontrado: '" + request.getRoleName() + "'. Crea el rol primero en /api/roles"));
 
-        // Generar username automáticamente: nombre.apellido + número si duplicado
-        String baseUsername = generarUsername(request.getFirstName(), request.getLastName());
+        // Generar username automático: fn + mn + ln
+        String username = generarUsername(request.getFirstName(), request.getMiddleName(), request.getLastName());
+
+        // La cédula/documento es la contraseña inicial
+        String passwordHash = passwordEncoder.encode(request.getDocumentNumber());
 
         // Crear usuario
         User user = User.builder()
-                .username(baseUsername)
-                .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .username(username)
+                .passwordHash(passwordHash)
                 .email(request.getEmail().toLowerCase())
                 .active(true)
                 .build();
         User savedUser = userRepository.save(user);
 
-        // Crear Person vinculada
+        // Crear Person vinculada (UUID compartido via @MapsId)
         Person person = Person.builder()
                 .id(savedUser.getId())
                 .user(savedUser)
@@ -95,15 +101,16 @@ public class UserServiceImpl {
                 .birthDate(request.getBirthDate())
                 .build();
         savedUser.setPerson(person);
+        userRepository.save(savedUser);
 
-        // Asignar rol
+        // Asignar rol inicial
         UserRole userRole = UserRole.builder()
                 .user(savedUser)
                 .role(role)
                 .build();
         userRoleRepository.save(userRole);
 
-        log.info("Usuario creado: {} con rol: {}", savedUser.getUsername(), role.getName());
+        log.info("Usuario creado: '{}' con rol: '{}' (contraseña = cédula)", savedUser.getUsername(), role.getName());
         return toResponse(userRepository.findById(savedUser.getId()).orElse(savedUser));
     }
 
@@ -114,7 +121,7 @@ public class UserServiceImpl {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con id: " + id));
 
-        // Actualizar contraseña si se provee
+        // Actualizar contraseña si se provee (se sigue permitiendo cambio manual)
         if (request.getNewPassword() != null && !request.getNewPassword().isBlank()) {
             user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
         }
@@ -122,19 +129,27 @@ public class UserServiceImpl {
         // Activar/desactivar cuenta
         if (request.getActive() != null) {
             user.setActive(request.getActive());
+            log.info("Cuenta {} {}: {}", user.getUsername(),
+                    request.getActive() ? "activada" : "desactivada", id);
         }
 
-        // Actualizar Person
+        // Actualizar Person si existe (o crear datos personales si no tiene)
         Person person = user.getPerson();
-        if (person != null) {
-            if (request.getFirstName() != null)  person.setFirstName(request.getFirstName());
-            if (request.getLastName() != null)   person.setLastName(request.getLastName());
-            if (request.getPhone() != null)      person.setPhone(request.getPhone());
-            if (request.getAddress() != null)    person.setAddress(request.getAddress());
-            if (request.getBirthDate() != null)  person.setBirthDate(request.getBirthDate());
+        if (person == null) {
+            person = Person.builder()
+                    .id(user.getId())
+                    .user(user)
+                    .build();
         }
+        if (request.getFirstName() != null && !request.getFirstName().isBlank())
+            person.setFirstName(request.getFirstName());
+        if (request.getLastName() != null && !request.getLastName().isBlank())
+            person.setLastName(request.getLastName());
+        if (request.getPhone() != null)      person.setPhone(request.getPhone());
+        if (request.getAddress() != null)    person.setAddress(request.getAddress());
+        if (request.getBirthDate() != null)  person.setBirthDate(request.getBirthDate());
+        user.setPerson(person);
 
-        log.info("Usuario actualizado: {}", user.getUsername());
         return toResponse(userRepository.save(user));
     }
 
@@ -159,7 +174,7 @@ public class UserServiceImpl {
 
     @Transactional
     public UserResponse removeRole(UUID userId, UUID roleId) {
-        userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con id: " + userId));
 
         if (!userRoleRepository.existsByUserIdAndRoleId(userId, roleId)) {
@@ -173,7 +188,8 @@ public class UserServiceImpl {
         }
 
         userRoleRepository.deleteByUserIdAndRoleId(userId, roleId);
-        log.info("Rol removido de usuario con id: {}", userId);
+        log.info("Rol {} removido de usuario '{}'", roleId, user.getUsername());
+        // Recargar para reflejar el cambio
         return toResponse(userRepository.findById(userId).orElseThrow());
     }
 
@@ -187,26 +203,58 @@ public class UserServiceImpl {
         log.info("Usuario eliminado: {}", user.getUsername());
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+    // ── Generación de Username ────────────────────────────────────────────────
 
     /**
-     * Genera username como "nombre.apellido" en minúsculas.
-     * Si ya existe, agrega un sufijo numérico incremental: "nombre.apellido1", "nombre.apellido2", ...
+     * Genera username como: primera letra del nombre + primera letra del segundo nombre (si existe)
+     * + primer apellido completo + primera letra del segundo apellido (si existe).
+     *
+     * Ejemplos:
+     *   fn="Ana", mn=null,   ln="García"        → "anagarcia"
+     *   fn="Ana", mn="María",ln="García"         → "amgarcia"
+     *   fn="Ana", mn="María",ln="García López"   → "amgarcial"
+     *
+     * Si el username ya existe, agrega sufijo numérico: "amgarcial", "amgarcial1", "amgarcial2"...
      */
-    private String generarUsername(String firstName, String lastName) {
-        String base = (firstName.trim().split("\\s+")[0] + "."
-                + lastName.trim().split("\\s+")[0])
-                .toLowerCase()
-                .replaceAll("[^a-z0-9.]", "");
-
-        String candidate = base;
-        int suffix = 1;
-        while (userRepository.existsByUsernameIgnoreCase(candidate)) {
-            candidate = base + suffix;
-            suffix++;
+    private String generarUsername(String fn, String mn, String ln) {
+        if (fn == null || fn.trim().isEmpty() || ln == null || ln.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Nombres y apellidos son obligatorios para generar el usuario");
         }
-        return candidate;
+
+        StringBuilder sb = new StringBuilder();
+
+        // Primera letra del primer nombre
+        sb.append(fn.trim().toLowerCase().charAt(0));
+
+        // Primera letra del segundo nombre (si existe)
+        if (mn != null && !mn.trim().isEmpty()) {
+            sb.append(mn.trim().toLowerCase().charAt(0));
+        }
+
+        // Primer apellido completo
+        String[] surnames = ln.trim().split("\\s+");
+        sb.append(surnames[0].toLowerCase());
+
+        // Primera letra del segundo apellido (si existe)
+        if (surnames.length > 1 && !surnames[1].isEmpty()) {
+            sb.append(surnames[1].toLowerCase().charAt(0));
+        }
+
+        String baseUsername = sb.toString()
+                .replaceAll("[^a-z0-9]", ""); // elimina caracteres no ASCII
+
+        String finalUsername = baseUsername;
+        int count = 1;
+        while (userRepository.findByUsernameIgnoreCase(finalUsername).isPresent()) {
+            finalUsername = baseUsername + count;
+            count++;
+        }
+
+        return finalUsername;
     }
+
+    // ── Mapeador ─────────────────────────────────────────────────────────────
 
     private UserResponse toResponse(User u) {
         PersonResponse personResponse = null;

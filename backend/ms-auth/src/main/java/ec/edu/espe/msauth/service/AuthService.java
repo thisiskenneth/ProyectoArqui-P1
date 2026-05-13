@@ -47,6 +47,7 @@ public class AuthService {
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
             log.warn("Intento de login fallido para usuario: {}", request.getUsername());
+            // Mensaje genérico para no revelar si el usuario existe
             throw new IllegalArgumentException("Credenciales inválidas.");
         }
 

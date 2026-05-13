@@ -10,17 +10,20 @@ import ec.edu.espe.msruteo.entity.Shipment;
 import ec.edu.espe.msruteo.entity.ShipmentStatus;
 import ec.edu.espe.msruteo.publisher.EventPublisher;
 import ec.edu.espe.msruteo.repository.ShipmentRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class ShipmentService {
 
     private final ShipmentRepository shipmentRepository;
@@ -28,52 +31,54 @@ public class ShipmentService {
     private final TallerClient tallerClient;
     private final EventPublisher eventPublisher;
 
+    @Transactional
     public ShipmentResponse assignShipment(AssignmentRequest request) {
-        log.info("Procesando asignación para pedido: {}", request.getOrderId());
+        UUID orderId = UUID.fromString(request.getOrderId());
+        log.info("Procesando asignación para pedido: {}", orderId);
 
-        if (shipmentRepository.existsByOrderId(request.getOrderId())) {
-            log.warn("El pedido {} ya tiene un envío asignado. Omitiendo.", request.getOrderId());
-            return convertToResponse(shipmentRepository.findByOrderId(request.getOrderId()).get(0));
+        // Si ya existe un envío para este pedido, devolver el existente
+        if (shipmentRepository.existsByOrderId(orderId)) {
+            log.warn("El pedido {} ya tiene un envío asignado. Devolviendo existente.", orderId);
+            return convertToResponse(shipmentRepository.findFirstByOrderId(orderId)
+                    .orElseThrow(() -> new EntityNotFoundException("Envío no encontrado para pedido: " + orderId)));
         }
 
         // 1. Consultar vehículos disponibles en ms-flota-rest
         List<VehicleResponse> availableVehicles = fleetClient.getAvailableVehicles();
-
         if (availableVehicles.isEmpty()) {
-            throw new RuntimeException("No hay vehículos disponibles para la asignación");
+            throw new IllegalStateException("No hay vehículos disponibles para la asignación");
         }
 
-        // 2. Lógica simple: tomar el primero
+        // 2. Lógica: tomar el primero disponible
         VehicleResponse vehicle = availableVehicles.get(0);
 
         // 3. Crear y guardar el envío
         Shipment shipment = Shipment.builder()
-                .orderId(request.getOrderId())
+                .orderId(orderId)
                 .vehicleId(vehicle.getId())
                 .vehiclePlate(vehicle.getPlate())
                 .origin(request.getOrigin())
                 .destination(request.getDestination())
                 .status(ShipmentStatus.ASSIGNED)
-                .assignedAt(LocalDateTime.now())
                 .build();
 
         Shipment savedShipment = shipmentRepository.save(shipment);
+        log.info("Envío creado: {} para pedido: {}", savedShipment.getId(), orderId);
 
-        // 4. Publicar evento para ms-notificaciones y otros
+        // 4. Publicar evento
         ShipmentEvent event = ShipmentEvent.builder()
                 .shipmentId(savedShipment.getId().toString())
-                .orderId(savedShipment.getOrderId())
+                .orderId(savedShipment.getOrderId().toString())
                 .driverName(null)
                 .plate(savedShipment.getVehiclePlate())
                 .customerEmail(request.getCustomerEmail())
                 .build();
-
         eventPublisher.publishShipmentAssigned(event);
 
-        // 5. Simulación de Fase 3: Probabilidad del 30% de solicitar mantenimiento preventivo
+        // 5. Mantenimiento preventivo aleatorio 30%
         if (Math.random() < 0.3) {
-            log.info("Simulación Fase 3: El vehículo {} requiere mantenimiento preventivo. Notificando a taller...", vehicle.getPlate());
-            tallerClient.requestMaintenance(vehicle.getPlate(), "Mantenimiento preventivo sugerido tras asignación de envío.");
+            log.info("Mantenimiento preventivo sugerido para vehículo: {}", vehicle.getPlate());
+            tallerClient.requestMaintenance(vehicle.getPlate(), "Mantenimiento preventivo tras asignación.");
         }
 
         return convertToResponse(savedShipment);
@@ -85,13 +90,13 @@ public class ShipmentService {
                 .collect(Collectors.toList());
     }
 
-    public ShipmentResponse findById(Long id) {
+    public ShipmentResponse findById(UUID id) {
         return shipmentRepository.findById(id)
                 .map(this::convertToResponse)
-                .orElseThrow(() -> new RuntimeException("Shipment not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Envío no encontrado con id: " + id));
     }
 
-    public List<ShipmentResponse> findByOrderId(String orderId) {
+    public List<ShipmentResponse> findByOrderId(UUID orderId) {
         return shipmentRepository.findByOrderId(orderId).stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
@@ -107,6 +112,7 @@ public class ShipmentService {
                 .destination(shipment.getDestination())
                 .status(shipment.getStatus())
                 .assignedAt(shipment.getAssignedAt())
+                .updatedAt(shipment.getUpdatedAt())
                 .build();
     }
 }
