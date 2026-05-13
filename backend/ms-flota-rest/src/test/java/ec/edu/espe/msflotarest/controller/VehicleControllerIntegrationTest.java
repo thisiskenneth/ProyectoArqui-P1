@@ -5,6 +5,8 @@ import ec.edu.espe.msflotarest.dto.VehicleDto;
 import ec.edu.espe.msflotarest.entity.Vehicle;
 import ec.edu.espe.msflotarest.entity.VehicleStatus;
 import ec.edu.espe.msflotarest.repository.VehicleRepository;
+import ec.edu.espe.msflotarest.soap.MaintenanceSoapClient;
+import ec.edu.espe.msflotarest.soap.model.RegistrarOrdenMantenimientoResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +14,14 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.UUID;
 
@@ -35,11 +44,19 @@ class VehicleControllerIntegrationTest {
     @Autowired
     private VehicleRepository vehicleRepository;
 
+    @MockitoBean
+    private MaintenanceSoapClient maintenanceSoapClient;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
         vehicleRepository.deleteAll();
+        RegistrarOrdenMantenimientoResponse soapResponse = new RegistrarOrdenMantenimientoResponse();
+        soapResponse.setCodigoOrden("ORD-TEST1");
+        soapResponse.setFechaIngreso("2026-05-13T10:00:00");
+        soapResponse.setMensaje("ok");
+        when(maintenanceSoapClient.registrar(any(), any())).thenReturn(soapResponse);
     }
 
     private VehicleDto sampleVehicle(String plate, VehicleStatus status) {
@@ -119,7 +136,7 @@ class VehicleControllerIntegrationTest {
     }
 
     @Test
-    void update_existing_updatesVehicle() throws Exception {
+    void update_toMaintenance_registersWorkshopOrderAndReturnsCode() throws Exception {
         Vehicle saved = vehicleRepository.save(Vehicle.builder()
                 .plate("OLD-001")
                 .type("Auto")
@@ -133,7 +150,50 @@ class VehicleControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updated)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("MAINTENANCE"));
+                .andExpect(jsonPath("$.status").value("MAINTENANCE"))
+                .andExpect(jsonPath("$.maintenanceOrderCode").value("ORD-TEST1"));
+
+        verify(maintenanceSoapClient).registrar(eq("OLD-001"), any());
+    }
+
+    @Test
+    void update_withoutMaintenanceTransition_doesNotCallSoap() throws Exception {
+        Vehicle saved = vehicleRepository.save(Vehicle.builder()
+                .plate("KEEP-1")
+                .type("Auto")
+                .capacityKg(800.0)
+                .status(VehicleStatus.AVAILABLE)
+                .build());
+
+        VehicleDto updated = sampleVehicle("KEEP-1", VehicleStatus.AVAILABLE);
+
+        mockMvc.perform(put("/api/vehicles/{id}", saved.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updated)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.maintenanceOrderCode").doesNotExist());
+
+        verify(maintenanceSoapClient, never()).registrar(any(), any());
+    }
+
+    @Test
+    void update_alreadyInMaintenance_doesNotReRegisterOrder() throws Exception {
+        Vehicle saved = vehicleRepository.save(Vehicle.builder()
+                .plate("MNT-1")
+                .type("Auto")
+                .capacityKg(800.0)
+                .status(VehicleStatus.MAINTENANCE)
+                .build());
+
+        VehicleDto updated = sampleVehicle("MNT-1", VehicleStatus.MAINTENANCE);
+
+        mockMvc.perform(put("/api/vehicles/{id}", saved.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updated)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.maintenanceOrderCode").doesNotExist());
+
+        verify(maintenanceSoapClient, never()).registrar(any(), any());
     }
 
     @Test

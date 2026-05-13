@@ -6,6 +6,8 @@ import ec.edu.espe.msflotarest.entity.VehicleStatus;
 import ec.edu.espe.msflotarest.exception.DuplicateResourceException;
 import ec.edu.espe.msflotarest.exception.ResourceNotFoundException;
 import ec.edu.espe.msflotarest.repository.VehicleRepository;
+import ec.edu.espe.msflotarest.soap.MaintenanceSoapClient;
+import ec.edu.espe.msflotarest.soap.model.RegistrarOrdenMantenimientoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +19,10 @@ import java.util.UUID;
 public class VehicleService {
 
     private static final String NOT_FOUND_MESSAGE = "Vehículo no encontrado con id: ";
+    private static final String AUTO_MAINTENANCE_DESCRIPTION = "Ingreso a mantenimiento programado";
 
     private final VehicleRepository vehicleRepository;
+    private final MaintenanceSoapClient maintenanceSoapClient;
 
     public List<VehicleDto> findAll() {
         return vehicleRepository.findAll().stream()
@@ -50,13 +54,23 @@ public class VehicleService {
             }
         });
 
+        VehicleStatus previousStatus = vehicle.getStatus();
         vehicle.setPlate(dto.getPlate());
         vehicle.setType(dto.getType());
         vehicle.setCapacityKg(dto.getCapacityKg());
         vehicle.setAutonomyKm(dto.getAutonomyKm());
         vehicle.setStatus(dto.getStatus());
 
-        return convertToDto(vehicleRepository.save(vehicle));
+        Vehicle saved = vehicleRepository.save(vehicle);
+        VehicleDto result = convertToDto(saved);
+
+        if (dto.getStatus() == VehicleStatus.MAINTENANCE && previousStatus != VehicleStatus.MAINTENANCE) {
+            RegistrarOrdenMantenimientoResponse order = maintenanceSoapClient.registrar(
+                    saved.getPlate(), AUTO_MAINTENANCE_DESCRIPTION);
+            result.setMaintenanceOrderCode(order.getCodigoOrden());
+        }
+
+        return result;
     }
 
     public void delete(UUID id) {

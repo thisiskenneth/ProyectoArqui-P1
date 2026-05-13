@@ -1,11 +1,13 @@
 package ec.edu.espe.msflotarest.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import ec.edu.espe.msflotarest.entity.VehicleStatus;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.util.UUID;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class VehicleDto {
     private UUID id;
@@ -30,4 +32,6 @@ public class VehicleDto {
 
     @NotNull(message = "El estado es obligatorio")
     private VehicleStatus status;
+
+    private String maintenanceOrderCode;
 }

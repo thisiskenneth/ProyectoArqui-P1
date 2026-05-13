@@ -8,6 +8,7 @@ export interface Vehicle {
   capacityKg: number;
   autonomyKm: number;
   status: VehicleStatus;
+  maintenanceOrderCode?: string;
 }
 
 export interface Driver {

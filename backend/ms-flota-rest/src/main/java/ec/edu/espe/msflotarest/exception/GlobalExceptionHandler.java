@@ -38,6 +38,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(buildErrorBody(ex.getMessage(), HttpStatus.CONFLICT), HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(SoapServiceUnavailableException.class)
+    public ResponseEntity<Map<String, Object>> handleSoapUnavailable(SoapServiceUnavailableException ex) {
+        return new ResponseEntity<>(
+                buildErrorBody(ex.getMessage(), HttpStatus.SERVICE_UNAVAILABLE),
+                HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();

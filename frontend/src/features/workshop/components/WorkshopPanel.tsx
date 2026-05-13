@@ -1,19 +1,23 @@
 import type { FormEvent } from "react";
+import type { Vehicle } from "../../../types/fleet";
 import type { MaintenanceOrderResult, WorkshopVehicleResult } from "../../../types/workshop";
 import { Wrench, Search, ClipboardPlus } from "lucide-react";
 
 interface Props {
-  plate: string;
+  vehicles: Vehicle[];
+  selectedVehicleId: string;
   description: string;
   vehicleResult: WorkshopVehicleResult | null;
   orderResult: MaintenanceOrderResult | null;
-  onPlateChange: (v: string) => void;
+  onSelectedVehicleChange: (id: string) => void;
   onDescriptionChange: (v: string) => void;
   onQueryVehicle: (e: FormEvent<HTMLFormElement>) => void;
   onRegisterOrder: (e: FormEvent<HTMLFormElement>) => void;
 }
 
-export function WorkshopPanel({ plate, description, vehicleResult, orderResult, onPlateChange, onDescriptionChange, onQueryVehicle, onRegisterOrder }: Props) {
+export function WorkshopPanel({ vehicles, selectedVehicleId, description, vehicleResult, orderResult, onSelectedVehicleChange, onDescriptionChange, onQueryVehicle, onRegisterOrder }: Props) {
+  const noVehicles = vehicles.length === 0;
+
   return (
     <div className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-6">
       <div className="flex items-center gap-3 mb-6">
@@ -21,26 +25,49 @@ export function WorkshopPanel({ plate, description, vehicleResult, orderResult, 
           <Wrench className="w-5 h-5 text-amber-400" />
         </div>
         <div>
-          <h2 className="text-lg font-semibold text-white">Taller SOAP</h2>
-          <p className="text-sm text-slate-400">Consulta y mantenimiento vía ms-taller-soap</p>
+          <h2 className="text-lg font-semibold text-white">Taller</h2>
+          <p className="text-sm text-slate-400">REST → SOAP vía ms-flota-rest → ms-taller-soap</p>
         </div>
       </div>
+
+      {noVehicles && (
+        <div className="mb-4 bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 text-sm text-amber-200">
+          Crea un vehículo primero en la pestaña "Vehículos" para poder consultar o registrar órdenes.
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Consultar */}
         <div className="space-y-4">
           <form onSubmit={onQueryVehicle} className="space-y-3">
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5">Matrícula del vehículo</label>
-              <input type="text" required placeholder="ABC-1234" className="w-full bg-white/[0.06] border border-white/[0.1] rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-amber-500/50 transition-all" value={plate} onChange={(e) => onPlateChange(e.target.value.toUpperCase())} />
+              <label className="block text-xs font-medium text-slate-400 mb-1.5">Vehículo</label>
+              <select
+                required
+                disabled={noVehicles}
+                className="w-full bg-white/[0.06] border border-white/[0.1] rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-amber-500/50 transition-all disabled:opacity-50"
+                value={selectedVehicleId}
+                onChange={(e) => onSelectedVehicleChange(e.target.value)}
+              >
+                <option value="">— Selecciona un vehículo —</option>
+                {vehicles.map((v) => (
+                  <option key={v.id} value={v.id ?? ""}>
+                    {v.plate} · {v.type} · {v.status}
+                  </option>
+                ))}
+              </select>
             </div>
-            <button type="submit" className="w-full flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-500 text-white font-medium text-sm px-4 py-2.5 rounded-lg transition-all active:scale-95 cursor-pointer">
-              <Search className="w-4 h-4" /> Consultar vehículo
+            <button
+              type="submit"
+              disabled={noVehicles || !selectedVehicleId}
+              className="w-full flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-sm px-4 py-2.5 rounded-lg transition-all active:scale-95 cursor-pointer"
+            >
+              <Search className="w-4 h-4" /> Consultar mantenimiento
             </button>
           </form>
           {vehicleResult && (
             <div className="bg-white/[0.04] border border-amber-500/20 rounded-xl p-4 space-y-2">
-              <p className="text-xs text-slate-400">Resultado SOAP</p>
+              <p className="text-xs text-slate-400">Respuesta del taller (vía REST)</p>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <span className="text-slate-400">Matrícula:</span><span className="text-white font-mono">{vehicleResult.matricula}</span>
                 <span className="text-slate-400">Estado:</span><span className="text-emerald-400 font-medium">{vehicleResult.estado}</span>
@@ -57,9 +84,21 @@ export function WorkshopPanel({ plate, description, vehicleResult, orderResult, 
           <form onSubmit={onRegisterOrder} className="space-y-3">
             <div>
               <label className="block text-xs font-medium text-slate-400 mb-1.5">Descripción de mantenimiento</label>
-              <textarea required rows={3} placeholder="Revisión preventiva..." className="w-full bg-white/[0.06] border border-white/[0.1] rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-amber-500/50 transition-all resize-none" value={description} onChange={(e) => onDescriptionChange(e.target.value)} />
+              <textarea
+                required
+                rows={3}
+                placeholder="Revisión preventiva..."
+                disabled={noVehicles}
+                className="w-full bg-white/[0.06] border border-white/[0.1] rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-amber-500/50 transition-all resize-none disabled:opacity-50"
+                value={description}
+                onChange={(e) => onDescriptionChange(e.target.value)}
+              />
             </div>
-            <button type="submit" className="w-full flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-500 text-white font-medium text-sm px-4 py-2.5 rounded-lg transition-all active:scale-95 cursor-pointer">
+            <button
+              type="submit"
+              disabled={noVehicles || !selectedVehicleId}
+              className="w-full flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-sm px-4 py-2.5 rounded-lg transition-all active:scale-95 cursor-pointer"
+            >
               <ClipboardPlus className="w-4 h-4" /> Registrar orden
             </button>
           </form>

@@ -21,7 +21,7 @@ export function App() {
   const [availability, setAvailability] = useState<FleetAvailability>({ vehicles: [], drivers: [] });
   const [vehicleForm, setVehicleForm] = useState<Vehicle>(emptyVehicle);
   const [driverForm, setDriverForm] = useState<Driver>(emptyDriver);
-  const [soapPlate, setSoapPlate] = useState("ABC-1234");
+  const [selectedVehicleId, setSelectedVehicleId] = useState("");
   const [soapDescription, setSoapDescription] = useState("Revision preventiva");
   const [soapVehicle, setSoapVehicle] = useState<WorkshopVehicleResult | null>(null);
   const [soapOrder, setSoapOrder] = useState<MaintenanceOrderResult | null>(null);
@@ -59,9 +59,13 @@ export function App() {
   async function submitVehicle(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
-      await saveVehicle(vehicleForm);
+      const saved = await saveVehicle(vehicleForm);
       setVehicleForm(emptyVehicle);
-      showToast(vehicleForm.id ? "Vehículo actualizado" : "Vehículo registrado");
+      if (saved.maintenanceOrderCode) {
+        showToast(`Vehículo actualizado · Orden taller: ${saved.maintenanceOrderCode}`);
+      } else {
+        showToast(vehicleForm.id ? "Vehículo actualizado" : "Vehículo registrado");
+      }
       await refreshData();
     } catch (err) { showToast(err instanceof Error ? err.message : "Error al guardar", "err"); }
   }
@@ -90,14 +94,16 @@ export function App() {
 
   async function queryWorkshopVehicle(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    try { setSoapVehicle(await consultarVehiculo(soapPlate)); showToast("Consulta SOAP completada"); }
-    catch (err) { showToast(err instanceof Error ? err.message : "Error SOAP", "err"); }
+    if (!selectedVehicleId) { showToast("Selecciona un vehículo", "err"); return; }
+    try { setSoapVehicle(await consultarVehiculo(selectedVehicleId)); showToast("Consulta de taller completada"); }
+    catch (err) { showToast(err instanceof Error ? err.message : "Error consultando taller", "err"); }
   }
 
   async function registerMaintenanceOrder(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    try { setSoapOrder(await registrarOrdenMantenimiento(soapPlate, soapDescription)); showToast("Orden SOAP registrada"); }
-    catch (err) { showToast(err instanceof Error ? err.message : "Error SOAP", "err"); }
+    if (!selectedVehicleId) { showToast("Selecciona un vehículo", "err"); return; }
+    try { setSoapOrder(await registrarOrdenMantenimiento(selectedVehicleId, soapDescription)); showToast("Orden de taller registrada"); }
+    catch (err) { showToast(err instanceof Error ? err.message : "Error registrando orden", "err"); }
   }
 
   const tabs: { id: Tab; label: string; icon: typeof Truck; count?: number; color: string }[] = [
@@ -169,7 +175,17 @@ export function App() {
         )}
         {tab === "availability" && <AvailabilityPanel availability={availability} />}
         {tab === "workshop" && (
-          <WorkshopPanel plate={soapPlate} description={soapDescription} vehicleResult={soapVehicle} orderResult={soapOrder} onPlateChange={setSoapPlate} onDescriptionChange={setSoapDescription} onQueryVehicle={(e) => void queryWorkshopVehicle(e)} onRegisterOrder={(e) => void registerMaintenanceOrder(e)} />
+          <WorkshopPanel
+            vehicles={vehicles}
+            selectedVehicleId={selectedVehicleId}
+            description={soapDescription}
+            vehicleResult={soapVehicle}
+            orderResult={soapOrder}
+            onSelectedVehicleChange={setSelectedVehicleId}
+            onDescriptionChange={setSoapDescription}
+            onQueryVehicle={(e) => void queryWorkshopVehicle(e)}
+            onRegisterOrder={(e) => void registerMaintenanceOrder(e)}
+          />
         )}
       </main>
 
