@@ -33,7 +33,7 @@ public class DriverService {
 
     public DriverDto save(DriverDto dto) {
         if (driverRepository.existsByLicenseNumber(dto.getLicenseNumber())) {
-            throw new DuplicateResourceException("Ya existe un conductor con la licencia: " + dto.getLicenseNumber());
+            throw new DuplicateResourceException("Ya existe un conductor con la cedula: " + dto.getLicenseNumber());
         }
         Driver driver = convertToEntity(dto);
         return convertToDto(driverRepository.save(driver));

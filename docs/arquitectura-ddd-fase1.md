@@ -167,7 +167,7 @@ Gestion de la cadena de entrega: asignacion inteligente de pedidos a vehiculos c
 - Pedido: protege consistencia del ciclo de vida de un pedido.
 - Envio: protege la relacion entre pedido, vehiculo, conductor y ruta.
 - Vehiculo: protege matricula, tipo, capacidad, autonomia y estado.
-- Conductor: protege licencia, datos personales y disponibilidad.
+- Conductor: protege cedula ecuatoriana, datos personales y disponibilidad.
 - OrdenMantenimiento: protege registro de mantenimiento y respuesta del taller.
 - Cliente: protege datos maestros y cuenta.
 - Factura: protege calculo y emision de cobro.

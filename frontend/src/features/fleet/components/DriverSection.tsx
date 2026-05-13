@@ -63,13 +63,14 @@ export function DriverSection({ drivers, form, onFormChange, onSubmit, onReset, 
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Licencia</label>
+            <label className="block text-xs font-medium text-slate-400 mb-1.5">Cedula</label>
             <input
               type="text"
               required
-              minLength={5}
-              maxLength={30}
-              placeholder="LIC-00123"
+              minLength={10}
+              maxLength={10}
+              pattern="[0-9]{10}"
+              placeholder="1710034065"
               className="w-full bg-white/[0.06] border border-white/[0.1] rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/30 transition-all"
               value={form.licenseNumber}
               onChange={(e) => onFormChange({ ...form, licenseNumber: e.target.value })}
@@ -134,7 +135,7 @@ export function DriverSection({ drivers, form, onFormChange, onSubmit, onReset, 
               <thead>
                 <tr className="border-b border-white/[0.08]">
                   <th className="text-left text-xs font-medium text-slate-400 px-6 py-3.5">Conductor</th>
-                  <th className="text-left text-xs font-medium text-slate-400 px-6 py-3.5">Licencia</th>
+                  <th className="text-left text-xs font-medium text-slate-400 px-6 py-3.5">Cedula</th>
                   <th className="text-left text-xs font-medium text-slate-400 px-6 py-3.5">Teléfono</th>
                   <th className="text-center text-xs font-medium text-slate-400 px-6 py-3.5">Estado</th>
                   <th className="text-center text-xs font-medium text-slate-400 px-6 py-3.5">Acciones</th>
