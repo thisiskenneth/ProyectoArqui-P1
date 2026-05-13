@@ -23,7 +23,8 @@ public class MaintenanceService {
         RegistrarOrdenMantenimientoResponse response = new RegistrarOrdenMantenimientoResponse();
         response.setCodigoOrden("ORD-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase());
         response.setFechaIngreso(LocalDateTime.now().toString());
-        response.setMensaje("Orden registrada con exito para el vehiculo " + matricula);
+        String detalle = (descripcion == null || descripcion.isBlank()) ? "sin descripcion" : descripcion;
+        response.setMensaje("Orden registrada con exito para el vehiculo " + matricula + " (" + detalle + ")");
         return response;
     }
 }

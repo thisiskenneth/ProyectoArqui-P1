@@ -2,34 +2,38 @@ package ec.edu.espe.msflotarest.service;
 
 import ec.edu.espe.msflotarest.dto.DriverDto;
 import ec.edu.espe.msflotarest.entity.Driver;
+import ec.edu.espe.msflotarest.exception.DuplicateResourceException;
+import ec.edu.espe.msflotarest.exception.ResourceNotFoundException;
 import ec.edu.espe.msflotarest.repository.DriverRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class DriverService {
+
+    private static final String NOT_FOUND_MESSAGE = "Conductor no encontrado con id: ";
+
     private final DriverRepository driverRepository;
 
     public List<DriverDto> findAll() {
         return driverRepository.findAll().stream()
                 .map(this::convertToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public DriverDto findById(UUID id) {
         return driverRepository.findById(id)
                 .map(this::convertToDto)
-                .orElseThrow(() -> new RuntimeException("Conductor no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(NOT_FOUND_MESSAGE + id));
     }
 
     public DriverDto save(DriverDto dto) {
         if (driverRepository.existsByLicenseNumber(dto.getLicenseNumber())) {
-            throw new IllegalArgumentException("Ya existe un conductor con la licencia: " + dto.getLicenseNumber());
+            throw new DuplicateResourceException("Ya existe un conductor con la licencia: " + dto.getLicenseNumber());
         }
         Driver driver = convertToEntity(dto);
         return convertToDto(driverRepository.save(driver));
@@ -37,7 +41,7 @@ public class DriverService {
 
     public DriverDto update(UUID id, DriverDto dto) {
         Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Conductor no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(NOT_FOUND_MESSAGE + id));
 
         driver.setFirstName(dto.getFirstName());
         driver.setLastName(dto.getLastName());
@@ -50,7 +54,7 @@ public class DriverService {
 
     public void delete(UUID id) {
         if (!driverRepository.existsById(id)) {
-            throw new RuntimeException("Conductor no encontrado con id: " + id);
+            throw new ResourceNotFoundException(NOT_FOUND_MESSAGE + id);
         }
         driverRepository.deleteById(id);
     }
@@ -58,7 +62,7 @@ public class DriverService {
     public List<DriverDto> findAvailable() {
         return driverRepository.findByAvailableTrue().stream()
                 .map(this::convertToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private DriverDto convertToDto(Driver entity) {

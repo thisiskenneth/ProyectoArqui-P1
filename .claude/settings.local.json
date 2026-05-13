@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn -v)",
+      "PowerShell(Get-Command mvn -ErrorAction SilentlyContinue)",
+      "PowerShell(mvn -v 2>&1)",
+      "WebSearch",
+      "PowerShell(Get-Command java -ErrorAction SilentlyContinue)",
+      "PowerShell($env:JAVA_HOME)",
+      "PowerShell(java -version 2>&1)"
+    ]
+  }
+}

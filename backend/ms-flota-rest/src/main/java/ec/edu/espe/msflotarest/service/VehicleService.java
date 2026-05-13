@@ -3,34 +3,38 @@ package ec.edu.espe.msflotarest.service;
 import ec.edu.espe.msflotarest.dto.VehicleDto;
 import ec.edu.espe.msflotarest.entity.Vehicle;
 import ec.edu.espe.msflotarest.entity.VehicleStatus;
+import ec.edu.espe.msflotarest.exception.DuplicateResourceException;
+import ec.edu.espe.msflotarest.exception.ResourceNotFoundException;
 import ec.edu.espe.msflotarest.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class VehicleService {
+
+    private static final String NOT_FOUND_MESSAGE = "Vehículo no encontrado con id: ";
+
     private final VehicleRepository vehicleRepository;
 
     public List<VehicleDto> findAll() {
         return vehicleRepository.findAll().stream()
                 .map(this::convertToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public VehicleDto findById(UUID id) {
         return vehicleRepository.findById(id)
                 .map(this::convertToDto)
-                .orElseThrow(() -> new RuntimeException("Vehículo no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(NOT_FOUND_MESSAGE + id));
     }
 
     public VehicleDto save(VehicleDto dto) {
         if (vehicleRepository.existsByPlate(dto.getPlate())) {
-            throw new IllegalArgumentException("Ya existe un vehículo con la matrícula: " + dto.getPlate());
+            throw new DuplicateResourceException("Ya existe un vehículo con la matrícula: " + dto.getPlate());
         }
         Vehicle vehicle = convertToEntity(dto);
         return convertToDto(vehicleRepository.save(vehicle));
@@ -38,11 +42,11 @@ public class VehicleService {
 
     public VehicleDto update(UUID id, VehicleDto dto) {
         Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Vehículo no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(NOT_FOUND_MESSAGE + id));
 
         vehicleRepository.findByPlate(dto.getPlate()).ifPresent(existing -> {
             if (!existing.getId().equals(id)) {
-                throw new IllegalArgumentException("Ya existe otro vehículo con la matrícula: " + dto.getPlate());
+                throw new DuplicateResourceException("Ya existe otro vehículo con la matrícula: " + dto.getPlate());
             }
         });
 
@@ -57,7 +61,7 @@ public class VehicleService {
 
     public void delete(UUID id) {
         if (!vehicleRepository.existsById(id)) {
-            throw new RuntimeException("Vehículo no encontrado con id: " + id);
+            throw new ResourceNotFoundException(NOT_FOUND_MESSAGE + id);
         }
         vehicleRepository.deleteById(id);
     }
@@ -65,7 +69,7 @@ public class VehicleService {
     public List<VehicleDto> findAvailable() {
         return vehicleRepository.findByStatus(VehicleStatus.AVAILABLE).stream()
                 .map(this::convertToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private VehicleDto convertToDto(Vehicle entity) {

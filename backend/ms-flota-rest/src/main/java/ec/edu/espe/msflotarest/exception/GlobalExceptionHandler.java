@@ -15,28 +15,33 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
+    private static final String KEY_TIMESTAMP = "timestamp";
+    private static final String KEY_MESSAGE = "message";
+    private static final String KEY_STATUS = "status";
+    private static final String INVALID_UUID_MESSAGE = "Formato de ID inválido. Se espera un UUID válido.";
+
+    private Map<String, Object> buildErrorBody(String message, HttpStatus status) {
         Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("message", ex.getMessage());
-        response.put("status", HttpStatus.NOT_FOUND.value());
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        response.put(KEY_TIMESTAMP, LocalDateTime.now());
+        response.put(KEY_MESSAGE, message);
+        response.put(KEY_STATUS, status.value());
+        return response;
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException ex) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("message", ex.getMessage());
-        response.put("status", HttpStatus.CONFLICT.value());
-        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex) {
+        return new ResponseEntity<>(buildErrorBody(ex.getMessage(), HttpStatus.NOT_FOUND), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<Map<String, Object>> handleDuplicateResource(DuplicateResourceException ex) {
+        return new ResponseEntity<>(buildErrorBody(ex.getMessage(), HttpStatus.CONFLICT), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
+        ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
@@ -46,10 +51,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<Map<String, Object>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("message", "Formato de ID inválido. Se espera un UUID válido.");
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(buildErrorBody(INVALID_UUID_MESSAGE, HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
     }
 }
