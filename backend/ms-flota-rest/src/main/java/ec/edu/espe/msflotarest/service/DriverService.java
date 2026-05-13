@@ -51,6 +51,12 @@ public class DriverService {
         driverRepository.deleteById(id);
     }
 
+    public List<DriverDto> findAvailable() {
+        return driverRepository.findByAvailableTrue().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
     private DriverDto convertToDto(Driver entity) {
         DriverDto dto = new DriverDto();
         dto.setId(entity.getId());

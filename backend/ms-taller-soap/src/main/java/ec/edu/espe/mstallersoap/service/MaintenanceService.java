@@ -15,7 +15,7 @@ public class MaintenanceService {
         response.setMatricula(matricula);
         response.setEstado("DISPONIBLE");
         response.setUltimoMantenimiento("2026-01-10");
-        response.setObservaciones("Vehículo en buen estado. Próximo cambio de aceite en 500km.");
+        response.setObservaciones("Vehiculo en buen estado. Proximo cambio de aceite en 500km.");
         return response;
     }
 
@@ -23,7 +23,7 @@ public class MaintenanceService {
         RegistrarOrdenMantenimientoResponse response = new RegistrarOrdenMantenimientoResponse();
         response.setCodigoOrden("ORD-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase());
         response.setFechaIngreso(LocalDateTime.now().toString());
-        response.setMensaje("Orden registrada con éxito para el vehículo " + matricula);
+        response.setMensaje("Orden registrada con exito para el vehiculo " + matricula);
         return response;
     }
 }

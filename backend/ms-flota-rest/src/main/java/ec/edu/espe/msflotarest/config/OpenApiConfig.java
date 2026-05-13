@@ -15,7 +15,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("LogiFlow - ms-flota-rest API")
                         .version("1.0.0")
-                        .description("Microservicio para la gestión de flota y conductores.")
+                        .description("Microservicio REST para gestion de vehiculos, conductores y disponibilidad de flota.")
                         .license(new License().name("Apache 2.0").url("http://springdoc.org")));
     }
 }

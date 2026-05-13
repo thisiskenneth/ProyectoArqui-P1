@@ -1,202 +1,257 @@
-# LogiFlow Backend
+# LogiFlow - Fase 1
 
-Backend distribuido para la plataforma LogiFlow, alineado con los microservicios, APIs, eventos e infraestructura exigidos por el PDF del proyecto.
+Repositorio preparado para la Fase 1 del proyecto LogiFlow: descubrimiento DDD, piloto REST de flota, piloto SOAP de taller y pipeline DevOps basico.
 
-## Microservicios
+## Alcance exacto
 
-| Servicio | API | Responsabilidad |
-| --- | --- | --- |
-| `ms-auth` | REST | Registro, login y verificacion de JWT. |
-| `ms-clientes` | REST | CRUD de clientes y cuentas corporativas. |
-| `ms-pedidos` | REST + RabbitMQ | Recepcion y gestion de pedidos; publica eventos de pedidos. |
-| `ms-ruteo` | REST + RabbitMQ | Asignacion de pedidos a vehiculos y consulta de envios. |
-| `ms-seguimiento` | WebSockets + RabbitMQ | Consume posiciones y las retransmite en tiempo real. No expone REST. |
-| `ms-flota-rest` | REST | CRUD de vehiculos/conductores y disponibilidad para ruteo. |
-| `ms-taller-soap` | SOAP | Consulta de vehiculo y registro de ordenes de mantenimiento. |
-| `ms-facturacion` | REST + RabbitMQ | Consume pedidos entregados y expone facturas. |
-| `ms-notificaciones` | RabbitMQ | Consume eventos y simula notificaciones por logs. No expone API externa. |
-| `graphql-gateway` | GraphQL + RabbitMQ | BFF GraphQL para pedidos, envios y ultima posicion conocida. |
+Incluye como entregables de Fase 1:
 
-## Ejecucion Local
+- Documento DDD / propuesta de arquitectura: `docs/arquitectura-ddd-fase1.md`.
+- Microservicio REST `ms-flota-rest`.
+- Microservicio SOAP `ms-taller-soap`.
+- Pipeline GitHub Actions para compilar, probar, analizar con SonarCloud y notificar a Telegram.
 
-Requisitos:
+No incluye como entregable de Fase 1:
+
+- Frontend.
+- GraphQL.
+- WebSockets.
+- RabbitMQ.
+- Kubernetes o Helm.
+- API Gateway externo.
+- Autenticacion.
+- Clientes.
+- Pedidos.
+- Ruteo ejecutable.
+- Seguimiento ejecutable.
+- Facturacion.
+- Notificaciones.
+- Despliegue cloud.
+
+El directorio `frontend/` puede permanecer en el repositorio como trabajo fuera de alcance, pero no participa en `docker-compose.yml`, no se valida en el pipeline de Fase 1 y no cuenta como entregable de esta fase.
+
+## Estructura Fase 1
+
+```text
+backend/
+  ms-flota-rest/
+  ms-taller-soap/
+docs/
+  arquitectura-ddd-fase1.md
+  devops-fase1.md
+.github/workflows/backend-ci.yml
+docker-compose.yml
+sonar-project.properties
+README.md
+```
+
+## Requisitos locales
+
 - JDK 21.
-- Docker y Docker Compose.
+- Docker y Docker Compose, solo si se desea ejecutar los dos pilotos con contenedores.
+- Git.
 
-Levantar todo el backend:
+## Ejecucion local con Docker Compose
 
 ```bash
 docker compose up -d --build
 ```
 
-Ver estado:
+Servicios publicados:
+
+- `ms-flota-rest`: `http://localhost:8081`
+- `ms-taller-soap`: `http://localhost:8089`
+
+Detener servicios:
 
 ```bash
-docker compose ps -a
+docker compose down
 ```
 
-Compilar todos los servicios:
+## Ejecucion local sin Docker
 
-```bash
-for service in ms-auth ms-clientes ms-flota-rest ms-taller-soap ms-pedidos ms-ruteo ms-seguimiento ms-facturacion ms-notificaciones graphql-gateway; do
-  (cd "backend/$service" && ./mvnw -DskipTests compile)
-done
-```
-
-En Windows PowerShell:
+Compilar y probar `ms-flota-rest`:
 
 ```powershell
-$services = 'ms-auth','ms-clientes','ms-flota-rest','ms-taller-soap','ms-pedidos','ms-ruteo','ms-seguimiento','ms-facturacion','ms-notificaciones','graphql-gateway'
-foreach ($service in $services) {
-  Push-Location "backend\$service"
-  .\mvnw.cmd -DskipTests compile
-  Pop-Location
-}
+Push-Location backend\ms-flota-rest
+.\mvnw.cmd test
+Pop-Location
 ```
 
-## Puertos Locales
+Ejecutar `ms-flota-rest`:
 
-| Servicio | Puerto |
-| --- | --- |
-| `graphql-gateway` | `8080` |
-| `ms-flota-rest` | `8081` |
-| `ms-ruteo` | `8082` |
-| `ms-seguimiento` | `8083` |
-| `ms-facturacion` | `8084` |
-| `ms-clientes` | `8086` |
-| `ms-pedidos` | `8087` |
-| `ms-auth` | `8088` |
-| `ms-taller-soap` | `8089` |
-| RabbitMQ AMQP | `5672` |
-| RabbitMQ Management | `15672` |
+```powershell
+Push-Location backend\ms-flota-rest
+.\mvnw.cmd spring-boot:run
+Pop-Location
+```
 
-`ms-notificaciones` no publica puerto porque el PDF exige que no tenga API externa.
+Compilar y probar `ms-taller-soap`:
 
-## Endpoints REST
+```powershell
+Push-Location backend\ms-taller-soap
+.\mvnw.cmd test
+Pop-Location
+```
 
-Autenticacion:
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/auth/verify?token=...`
+Ejecutar `ms-taller-soap`:
 
-Clientes:
-- `GET|POST /api/clients`
-- `GET|PUT|DELETE /api/clients/{id}`
-- `GET|POST /api/corporate-accounts`
+```powershell
+Push-Location backend\ms-taller-soap
+.\mvnw.cmd spring-boot:run
+Pop-Location
+```
 
-Flota:
-- `GET|POST /api/vehicles`
-- `GET|PUT|DELETE /api/vehicles/{id}`
+## ms-flota-rest
+
+Puerto local: `8081`
+
+Documentacion:
+
+- Swagger UI: `http://localhost:8081/swagger-ui.html`
+- OpenAPI JSON: `http://localhost:8081/api-docs`
+
+Endpoints:
+
+- `GET /api/vehicles`
+- `GET /api/vehicles/{id}`
+- `POST /api/vehicles`
+- `PUT /api/vehicles/{id}`
+- `DELETE /api/vehicles/{id}`
 - `GET /api/vehicles/available`
-- `GET|POST /api/drivers`
-- `GET|PUT|DELETE /api/drivers/{id}`
-- Swagger local: `http://localhost:8081/swagger-ui.html`
+- `GET /api/drivers`
+- `GET /api/drivers/{id}`
+- `POST /api/drivers`
+- `PUT /api/drivers/{id}`
+- `DELETE /api/drivers/{id}`
+- `GET /api/drivers/available`
+- `GET /api/fleet/availability`
 
-Pedidos:
-- `GET|POST /api/orders`
-- `GET /api/orders/{id}`
-- `GET /api/orders/active/client/{clientId}`
-- `POST /api/orders/{id}/cancel`
-- `POST /api/orders/{id}/deliver`
+Este servicio expone solo REST. No contiene SOAP, GraphQL, WebSockets ni mensajeria.
 
-Ruteo:
-- `POST /api/shipments/assign`
-- `GET /api/shipments`
-- `GET /api/shipments/{id}`
-- `GET /api/shipments/order/{orderId}`
+## ms-taller-soap
 
-Facturacion:
-- `GET /api/invoices`
-- `GET /api/invoices/{id}`
-- `GET /api/invoices/order/{orderId}`
+Puerto local: `8089`
 
-## SOAP
+Contrato:
 
-Servicio: `ms-taller-soap`
+- WSDL: `http://localhost:8089/ws/maintenance.wsdl`
+- Namespace: `http://espe.edu.ec/mstallersoap`
 
-- WSDL local: `http://localhost:8089/ws/maintenance.wsdl`
-- Operaciones:
-  - `consultarVehiculo(matricula)`
-  - `registrarOrdenMantenimiento(matricula, descripcion)`
+Operaciones:
 
-## GraphQL
+- `consultarVehiculo(matricula)`
+- `registrarOrdenMantenimiento(matricula, descripcion)`
 
-Endpoint local:
+Ejemplo de consulta SOAP:
 
-```text
-http://localhost:8080/graphql
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:tal="http://espe.edu.ec/mstallersoap">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <tal:ConsultarVehiculoRequest>
+      <tal:matricula>ABC-1234</tal:matricula>
+    </tal:ConsultarVehiculoRequest>
+  </soapenv:Body>
+</soapenv:Envelope>
 ```
 
-Queries:
-- `pedidosActivos(clienteId)`
-- `envio(id)` con datos del envio y `lastPosition`.
+Este servicio expone solo SOAP. No contiene controladores REST propios, GraphQL, WebSockets ni mensajeria.
 
-Mutations:
-- `crearPedido(input)`
-- `cancelarPedido(id)`
+## Pipeline Fase 1
 
-## WebSockets
+Workflow: `.github/workflows/backend-ci.yml`
 
-Servicio: `ms-seguimiento`
+Se ejecuta en:
 
-- Endpoint STOMP/SockJS local: `http://localhost:8083/ws-tracking`
-- Topicos:
-  - `/topic/shipment/{shipmentId}`
-  - `/topic/order/{orderId}`
+- `push` a `main`.
+- `push` a `development`.
+- `pull_request` hacia `main`.
+- `pull_request` hacia `development`.
 
-## Eventos RabbitMQ
+Valida solo:
 
-Exchange topic:
+- `backend/ms-flota-rest`
+- `backend/ms-taller-soap`
+- `sonar-project.properties`
 
-```text
-logiflow.exchange
-```
+Pasos del pipeline:
 
-Routing keys:
-- `pedido.creado`: publicado por `ms-pedidos`; consumido por `ms-ruteo` y `ms-notificaciones`.
-- `pedido.cancelado`: publicado por `ms-pedidos`; consumido por `ms-notificaciones`.
-- `pedido.entregado`: publicado por `ms-pedidos`; consumido por `ms-facturacion` y `ms-notificaciones`.
-- `envio.asignado`: publicado por `ms-ruteo`; consumido por `ms-pedidos` y `ms-notificaciones`.
-- `posicion.actualizada`: publicado por simulador/dispositivos; consumido por `ms-seguimiento` y `graphql-gateway`.
+- valida que existan los secrets externos requeridos;
+- configura JDK 21;
+- ejecuta `./mvnw -B test` en `ms-flota-rest`;
+- ejecuta `./mvnw -B test` en `ms-taller-soap`;
+- ejecuta SonarCloud con `sonar-project.properties`;
+- consulta resumen de SonarCloud: bugs, vulnerabilities, code smells y coverage;
+- envia resumen a Telegram.
 
-## Kubernetes y API Gateway
+## Secrets obligatorios en GitHub Actions
 
-Manifiestos:
+Crear en GitHub: `Settings > Secrets and variables > Actions > New repository secret`.
 
-```text
-infrastructure/k8s/
-```
+| Secret | Valor exacto esperado | Proposito |
+| --- | --- | --- |
+| `SONAR_TOKEN` | Token generado en SonarCloud para este proyecto | Permite ejecutar analisis y consultar metricas |
+| `SONAR_PROJECT_KEY` | Project Key del proyecto en SonarCloud | Identifica el proyecto analizado |
+| `SONAR_ORGANIZATION` | Organization Key de SonarCloud | Identifica la organizacion |
+| `TELEGRAM_BOT_TOKEN` | Token del bot creado con BotFather | Permite enviar mensajes a Telegram |
+| `TELEGRAM_CHAT_ID` | ID numerico del chat o grupo destino | Define a donde se envia el resumen |
 
-Aplicar en un cluster con Nginx Ingress instalado:
+Si falta cualquiera de estos secrets, el pipeline falla al inicio. Esto evita una falsa entrega con SonarCloud o Telegram "opcional".
+
+## Configuracion de SonarCloud
+
+Archivo usado por el pipeline: `sonar-project.properties`.
+
+El archivo analiza solo Fase 1:
+
+- `backend/ms-flota-rest/src/main/java`
+- `backend/ms-taller-soap/src/main/java`
+
+Excluye:
+
+- `frontend/**`
+- `infrastructure/**`
+- `target/**`
+- `.idea/**`
+
+La cobertura se toma de JaCoCo:
+
+- `backend/ms-flota-rest/target/site/jacoco/jacoco.xml`
+- `backend/ms-taller-soap/target/site/jacoco/jacoco.xml`
+
+## Rama development
+
+El PDF exige `main` y `development`.
+
+Crear y publicar `development` desde el estado actual:
 
 ```bash
-kubectl apply -f infrastructure/k8s/namespace.yaml
-kubectl apply -f infrastructure/k8s/rabbitmq.yaml
-kubectl apply -f infrastructure/k8s/backend-services.yaml
-kubectl apply -f infrastructure/k8s/nginx-ingress.yaml
+git switch -c development
+git push -u origin development
 ```
 
-El Ingress `logiflow-gateway` enruta:
-- REST: `/api/auth`, `/api/clients`, `/api/corporate-accounts`, `/api/orders`, `/api/shipments`, `/api/vehicles`, `/api/drivers`, `/api/invoices`.
-- GraphQL: `/graphql`, `/graphiql`.
-- WebSockets: `/ws-tracking`.
-- SOAP: `/ws`.
+Si la rama ya existe localmente:
 
-## CI/CD
-
-Workflow:
-
-```text
-.github/workflows/backend-ci.yml
+```bash
+git switch development
+git push -u origin development
 ```
 
-Se ejecuta en `push` y `pull_request` hacia `main` y `development`.
+Verificar ramas:
 
-Configurar estos secretos en GitHub:
-- `SONAR_TOKEN`
-- `SONAR_PROJECT_KEY`
-- `SONAR_ORGANIZATION`
-- `TELEGRAM_BOT_TOKEN`
-- `TELEGRAM_CHAT_ID`
+```bash
+git branch --all
+```
 
-El pipeline compila todos los microservicios con JDK 21, ejecuta analisis SonarCloud cuando los secretos estan configurados y envia el resultado a Telegram.
+Debe aparecer:
+
+- `main`
+- `development`
+- `remotes/origin/main`
+- `remotes/origin/development`
+
+## Mas detalle DevOps
+
+La guia operativa completa esta en `docs/devops-fase1.md`.

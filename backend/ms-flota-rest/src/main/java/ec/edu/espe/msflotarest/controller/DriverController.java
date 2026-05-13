@@ -26,6 +26,11 @@ public class DriverController {
         return ResponseEntity.ok(driverService.findById(id));
     }
 
+    @GetMapping("/available")
+    public ResponseEntity<List<DriverDto>> getAvailable() {
+        return ResponseEntity.ok(driverService.findAvailable());
+    }
+
     @PostMapping
     public ResponseEntity<DriverDto> create(@Valid @RequestBody DriverDto driverDto) {
         return new ResponseEntity<>(driverService.save(driverDto), HttpStatus.CREATED);

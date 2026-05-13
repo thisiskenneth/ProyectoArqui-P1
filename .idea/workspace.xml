@@ -5,25 +5,204 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="423fe136-58bc-4de7-9bf0-75bdaf924de4" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/graphql-gateway/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ms-auth/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-auth/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ms-auth/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-auth/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-clientes/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-clientes/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-facturacion/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-facturacion/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ms-flota-rest/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-flota-rest/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/backend-ci.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/backend-ci.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/src/main/java/ec/edu/espe/graphqlgateway/GraphqlGatewayApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/src/main/java/ec/edu/espe/graphqlgateway/client/OrderClient.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/src/main/java/ec/edu/espe/graphqlgateway/client/ShipmentClient.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/src/main/java/ec/edu/espe/graphqlgateway/config/RabbitConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/src/main/java/ec/edu/espe/graphqlgateway/config/RestTemplateConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/src/main/java/ec/edu/espe/graphqlgateway/controller/GatewayResolver.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/src/main/java/ec/edu/espe/graphqlgateway/dto/OrderDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/src/main/java/ec/edu/espe/graphqlgateway/dto/PositionEvent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/src/main/java/ec/edu/espe/graphqlgateway/dto/ShipmentDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/src/main/java/ec/edu/espe/graphqlgateway/listener/PositionListener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/src/main/java/ec/edu/espe/graphqlgateway/service/GatewayService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/src/main/java/ec/edu/espe/graphqlgateway/service/RemoteSchemaService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/src/main/java/ec/edu/espe/graphqlgateway/service/TrackingPositionStore.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/src/main/resources/graphql/schema.graphqls" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphql-gateway/src/test/java/ec/edu/espe/graphqlgateway/GraphqlGatewayApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/src/main/java/ec/edu/espe/msauth/MsAuthApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/src/main/java/ec/edu/espe/msauth/config/SecurityConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/src/main/java/ec/edu/espe/msauth/controller/AuthController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/src/main/java/ec/edu/espe/msauth/dto/AuthRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/src/main/java/ec/edu/espe/msauth/dto/AuthResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/src/main/java/ec/edu/espe/msauth/dto/RegisterRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/src/main/java/ec/edu/espe/msauth/entity/Role.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/src/main/java/ec/edu/espe/msauth/entity/User.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/src/main/java/ec/edu/espe/msauth/repository/UserRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/src/main/java/ec/edu/espe/msauth/security/JwtUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/src/main/java/ec/edu/espe/msauth/service/AuthService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-auth/src/test/java/ec/edu/espe/msauth/MsAuthApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/src/main/java/ec/edu/espe/msclientes/MsClientesApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/src/main/java/ec/edu/espe/msclientes/controller/ClientController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/src/main/java/ec/edu/espe/msclientes/controller/CorporateAccountController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/src/main/java/ec/edu/espe/msclientes/dto/ClientDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/src/main/java/ec/edu/espe/msclientes/dto/CorporateAccountDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/src/main/java/ec/edu/espe/msclientes/entity/Client.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/src/main/java/ec/edu/espe/msclientes/entity/CorporateAccount.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/src/main/java/ec/edu/espe/msclientes/exception/GlobalExceptionHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/src/main/java/ec/edu/espe/msclientes/repository/ClientRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/src/main/java/ec/edu/espe/msclientes/repository/CorporateAccountRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/src/main/java/ec/edu/espe/msclientes/service/ClientService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/src/main/java/ec/edu/espe/msclientes/service/CorporateAccountService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-clientes/src/test/java/ec/edu/espe/msclientes/MsClientesApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/src/main/java/ec/edu/espe/msfacturacion/MsFacturacionApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/src/main/java/ec/edu/espe/msfacturacion/config/RabbitConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/src/main/java/ec/edu/espe/msfacturacion/controller/InvoiceController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/src/main/java/ec/edu/espe/msfacturacion/dto/OrderEvent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/src/main/java/ec/edu/espe/msfacturacion/entity/Invoice.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/src/main/java/ec/edu/espe/msfacturacion/listener/InvoiceListener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/src/main/java/ec/edu/espe/msfacturacion/repository/InvoiceRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/src/main/java/ec/edu/espe/msfacturacion/service/InvoiceService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-facturacion/src/test/java/ec/edu/espe/msfacturacion/MsFacturacionApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-flota-rest/src/main/java/ec/edu/espe/msflotarest/config/OpenApiConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-flota-rest/src/main/java/ec/edu/espe/msflotarest/config/OpenApiConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-flota-rest/src/main/java/ec/edu/espe/msflotarest/controller/DriverController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-flota-rest/src/main/java/ec/edu/espe/msflotarest/controller/DriverController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-flota-rest/src/main/java/ec/edu/espe/msflotarest/service/DriverService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-flota-rest/src/main/java/ec/edu/espe/msflotarest/service/DriverService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/ms-flota-rest/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-flota-rest/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-notificaciones/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-notificaciones/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-pedidos/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-pedidos/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-ruteo/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-ruteo/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-seguimiento/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-seguimiento/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ms-taller-soap/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-taller-soap/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/src/main/java/ec/edu/espe/msnotificaciones/MsNotificacionesApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/src/main/java/ec/edu/espe/msnotificaciones/config/AsyncConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/src/main/java/ec/edu/espe/msnotificaciones/config/RabbitConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/src/main/java/ec/edu/espe/msnotificaciones/dto/NotificationDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/src/main/java/ec/edu/espe/msnotificaciones/dto/OrderEvent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/src/main/java/ec/edu/espe/msnotificaciones/dto/ShipmentEvent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/src/main/java/ec/edu/espe/msnotificaciones/listener/NotificationListener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/src/main/java/ec/edu/espe/msnotificaciones/service/NotificationService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-notificaciones/src/test/java/ec/edu/espe/msnotificaciones/MsNotificacionesApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/src/main/java/ec/edu/espe/mspedidos/MsPedidosApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/src/main/java/ec/edu/espe/mspedidos/config/RabbitConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/src/main/java/ec/edu/espe/mspedidos/controller/OrderController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/src/main/java/ec/edu/espe/mspedidos/dto/OrderRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/src/main/java/ec/edu/espe/mspedidos/dto/OrderResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/src/main/java/ec/edu/espe/mspedidos/dto/ShipmentEvent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/src/main/java/ec/edu/espe/mspedidos/entity/Order.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/src/main/java/ec/edu/espe/mspedidos/exception/GlobalExceptionHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/src/main/java/ec/edu/espe/mspedidos/listener/ShipmentListener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/src/main/java/ec/edu/espe/mspedidos/publisher/OrderPublisher.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/src/main/java/ec/edu/espe/mspedidos/repository/OrderRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/src/main/java/ec/edu/espe/mspedidos/service/OrderService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-pedidos/src/test/java/ec/edu/espe/mspedidos/MsPedidosApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/src/main/java/ec/edu/espe/msruteo/MsRuteoApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/src/main/java/ec/edu/espe/msruteo/client/FleetClient.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/src/main/java/ec/edu/espe/msruteo/config/RabbitConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/src/main/java/ec/edu/espe/msruteo/config/RestTemplateConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/src/main/java/ec/edu/espe/msruteo/controller/ShipmentController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/src/main/java/ec/edu/espe/msruteo/dto/AssignmentRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/src/main/java/ec/edu/espe/msruteo/dto/OrderEvent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/src/main/java/ec/edu/espe/msruteo/dto/ShipmentEvent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/src/main/java/ec/edu/espe/msruteo/dto/VehicleResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/src/main/java/ec/edu/espe/msruteo/entity/Shipment.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/src/main/java/ec/edu/espe/msruteo/entity/ShipmentStatus.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/src/main/java/ec/edu/espe/msruteo/listener/OrderListener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/src/main/java/ec/edu/espe/msruteo/publisher/EventPublisher.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/src/main/java/ec/edu/espe/msruteo/repository/ShipmentRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/src/main/java/ec/edu/espe/msruteo/service/ShipmentService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-ruteo/src/test/java/ec/edu/espe/msruteo/MsRuteoApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/src/main/java/ec/edu/espe/msseguimiento/MsSeguimientoApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/src/main/java/ec/edu/espe/msseguimiento/config/RabbitConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/src/main/java/ec/edu/espe/msseguimiento/config/WebSocketConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/src/main/java/ec/edu/espe/msseguimiento/dto/PositionEvent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/src/main/java/ec/edu/espe/msseguimiento/entity/TrackingLog.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/src/main/java/ec/edu/espe/msseguimiento/listener/PositionListener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/src/main/java/ec/edu/espe/msseguimiento/repository/TrackingRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/src/main/java/ec/edu/espe/msseguimiento/service/TrackingService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-seguimiento/src/test/java/ec/edu/espe/msseguimiento/MsSeguimientoApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-taller-soap/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-taller-soap/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-taller-soap/src/main/java/ec/edu/espe/mstallersoap/model/MaintenanceRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-taller-soap/src/main/java/ec/edu/espe/mstallersoap/model/MaintenanceResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-taller-soap/src/main/java/ec/edu/espe/mstallersoap/service/MaintenanceService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-taller-soap/src/main/java/ec/edu/espe/mstallersoap/service/MaintenanceService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/favicon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/icons.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/AppRouter.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/assets/hero.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/assets/react.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/assets/vite.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/index.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/main.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/main.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/client/ClientDashboard.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/fleet/FleetDashboard.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/login/LoginPage.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/operator/OperatorDashboard.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/tracking/TrackingPage.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/api/restClient.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/graphql/apolloClient.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/ws/socketClient.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/types/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/vite.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infrastructure/k8s/backend-services.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/infrastructure/k8s/namespace.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/infrastructure/k8s/nginx-ingress.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/infrastructure/k8s/rabbitmq.yaml" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,9 +216,9 @@
     <commands />
     <urls />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="3DSjO2vXtC71nXimevBq2j7OULP" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -50,10 +229,11 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "Ken",
+    "git-widget-placeholder": "feature/fase1",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "D:/ESPE/9no Semestre/Arquitectura de Software/1er Parcial/Proyecto",
@@ -82,6 +262,7 @@
       <option name="presentableId" value="Default" />
       <updated>1778282329954</updated>
       <workItem from="1778282331259" duration="654000" />
+      <workItem from="1778645468901" duration="113000" />
     </task>
     <servers />
   </component>
