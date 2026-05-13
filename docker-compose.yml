@@ -1,10 +1,33 @@
 services:
+  db-flota:
+    image: postgres:15-alpine
+    container_name: db-flota
+    environment:
+      POSTGRES_DB: flotadb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata-flota:/var/lib/postgresql/data
+
   ms-flota-rest:
     build: ./backend/ms-flota-rest
+    container_name: ms-flota-rest
     ports:
       - "8081:8081"
+    environment:
+      DB_URL: jdbc:postgresql://db-flota:5432/flotadb
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+    depends_on:
+      - db-flota
 
   ms-taller-soap:
     build: ./backend/ms-taller-soap
+    container_name: ms-taller-soap
     ports:
       - "8089:8089"
+
+volumes:
+  pgdata-flota:
