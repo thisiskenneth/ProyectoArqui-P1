@@ -8,7 +8,7 @@ Incluye como entregables de Fase 1:
 
 - Documento DDD / propuesta de arquitectura: `docs/arquitectura-ddd-fase1.md`.
 - Microservicio REST `ms-flota-rest`.
-- Microservicio REST `ms-taller-soap`.
+- Microservicio REST `ms-taller-rest`.
 - Pipeline GitHub Actions para compilar, probar, analizar con SonarCloud y notificar a Telegram.
 
 No incluye como entregable de Fase 1:
@@ -60,7 +60,7 @@ docker compose up -d --build
 Servicios publicados:
 
 - `ms-flota-rest`: `http://localhost:8081`
-- `ms-taller-soap`: `http://localhost:8089`
+- `ms-taller-rest`: `http://localhost:8089`
 
 Detener servicios:
 
@@ -129,7 +129,7 @@ Endpoints:
 
 Este servicio expone solo REST. No contiene GraphQL, WebSockets ni mensajeria.
 
-## ms-taller-soap
+## ms-taller-rest
 
 Puerto local: `8089`
 
@@ -142,6 +142,8 @@ Endpoints:
 
 - `GET /api/vehiculos/{matricula}`
 - `POST /api/mantenimientos`
+- `GET /vehiculos/{matricula}`
+- `POST /mantenimientos`
 
 Este servicio expone solo REST. No contiene GraphQL, WebSockets ni mensajeria.
 
@@ -167,7 +169,7 @@ Pasos del pipeline:
 - valida que existan los secrets externos requeridos;
 - configura JDK 21;
 - ejecuta `./mvnw -B test` en `ms-flota-rest`;
-- ejecuta `./mvnw -B test` en `ms-taller-soap`;
+- ejecuta `./mvnw -B test` en `ms-taller-rest`;
 - ejecuta SonarCloud con `sonar-project.properties`;
 - consulta resumen de SonarCloud: bugs, vulnerabilities, code smells y coverage;
 - envia resumen a Telegram.

@@ -49,6 +49,14 @@ class MaintenanceRestControllerTest {
     }
 
     @Test
+    void getVehiculo_withoutApiPrefix_isAvailableForRubricContract() throws Exception {
+        mockMvc.perform(get("/vehiculos/{matricula}", "NUEVO-1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.matricula").value("NUEVO-1"))
+                .andExpect(jsonPath("$.estado").value("DISPONIBLE"));
+    }
+
+    @Test
     void getVehiculo_withHistory_returnsLatestOrderInfo() throws Exception {
         repository.save(MaintenanceOrder.builder()
                 .codigoOrden("ORD-AAA")
@@ -81,6 +89,20 @@ class MaintenanceRestControllerTest {
 
         org.assertj.core.api.Assertions.assertThat(
                 repository.findFirstByMatriculaOrderByFechaIngresoDesc("REG-1")).isPresent();
+    }
+
+    @Test
+    void registrarMantenimiento_withoutApiPrefix_isAvailableForRubricContract() throws Exception {
+        MantenimientoRequest body = new MantenimientoRequest();
+        body.setMatricula("REG-ROOT");
+        body.setDescripcion("Revision de frenos");
+
+        mockMvc.perform(post("/mantenimientos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(body)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.codigoOrden").exists())
+                .andExpect(jsonPath("$.mensaje").value(org.hamcrest.Matchers.containsString("REG-ROOT")));
     }
 
     @Test

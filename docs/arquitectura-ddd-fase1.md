@@ -5,7 +5,7 @@
 Este documento cubre el descubrimiento estrategico del dominio LogiFlow solicitado para Fase 1. Describe el dominio completo para poder defender la arquitectura futura, pero la implementacion de esta rama se limita a dos pilotos:
 
 - `ms-flota-rest`: API REST para flota.
-- `ms-taller-soap`: API REST para taller.
+- `ms-taller-rest`: API REST para taller.
 
 Los demas contextos se documentan como parte del analisis DDD, no como servicios ejecutables de Fase 1.
 
@@ -35,7 +35,7 @@ Gestion de la cadena de entrega: asignacion inteligente de pedidos a vehiculos c
 | Ruteo y Asignacion | Core Domain | Asignar pedidos a vehiculos y calcular rutas | Modelado, no implementado |
 | Seguimiento | Core relacionado | Posicion y trazabilidad en tiempo real | Modelado, no implementado |
 | Flota | Soporte | Vehiculos, conductores, disponibilidad y caracteristicas tecnicas | Implementado como `ms-flota-rest` |
-| Taller | Generico / ACL | Contrato REST para taller mecanico externo | Implementado como `ms-taller-soap` |
+| Taller | Generico / ACL | Contrato REST para taller mecanico externo | Implementado como `ms-taller-rest` |
 | Clientes | Soporte | Datos maestros de clientes y cuentas | Modelado, no implementado |
 | Facturacion | Soporte | Tarifas, costos y facturas | Modelado, no implementado |
 | Notificaciones | Soporte | Avisos por canal ante eventos relevantes | Modelado, no implementado |
@@ -191,7 +191,7 @@ Gestion de la cadena de entrega: asignacion inteligente de pedidos a vehiculos c
 ## 8. Decisiones de arquitectura para Fase 1
 
 - `ms-flota-rest` expone solo REST y documenta su contrato con Swagger/OpenAPI.
-- `ms-taller-soap` expone solo REST y documenta su contrato con Swagger/OpenAPI.
+- `ms-taller-rest` expone solo REST y documenta su contrato con Swagger/OpenAPI.
 - No se ejecutan buses de eventos, gateway GraphQL, WebSockets ni Kubernetes en esta rama.
 - El directorio `frontend/`, si permanece en el repositorio, queda fuera del entregable de Fase 1 y no participa en el pipeline ni en `docker-compose.yml`.
 - El pipeline valida unicamente los dos servicios de Fase 1.
@@ -210,8 +210,8 @@ Gestion de la cadena de entrega: asignacion inteligente de pedidos a vehiculos c
 
 ### REST Taller
 
-- Consulta de vehiculo: `/api/vehiculos/{matricula}`.
-- Registro de orden de mantenimiento: `/api/mantenimientos`.
+- Consulta de vehiculo: `/vehiculos/{matricula}` y alias `/api/vehiculos/{matricula}`.
+- Registro de orden de mantenimiento: `/mantenimientos` y alias `/api/mantenimientos`.
 
 ## 10. Riesgos y supuestos
 

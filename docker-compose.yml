@@ -32,14 +32,14 @@ services:
       DB_URL: jdbc:postgresql://db-flota:5432/flotadb
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
-      TALLER_API_URL: http://ms-taller-soap:8089/api
+      TALLER_API_URL: http://ms-taller-rest:8089/api
     depends_on:
       - db-flota
-      - ms-taller-soap
+      - ms-taller-rest
 
-  ms-taller-soap:
+  ms-taller-rest:
     build: ./backend/ms-taller-soap
-    container_name: ms-taller-soap
+    container_name: ms-taller-rest
     ports:
       - "8089:8089"
     environment:

@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>ec.edu.espe</groupId>
-    <artifactId>ms-taller-soap</artifactId>
+    <artifactId>ms-taller-rest</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ms-taller-soap</name>
-    <description>ms-taller-soap</description>
+    <name>ms-taller-rest</name>
+    <description>ms-taller-rest</description>
     <url/>
     <licenses>
         <license/>
