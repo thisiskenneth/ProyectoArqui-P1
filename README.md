@@ -1,6 +1,6 @@
 # LogiFlow - Fase 1
 
-Repositorio preparado para la Fase 1 del proyecto LogiFlow: descubrimiento DDD, piloto REST de flota, piloto SOAP de taller y pipeline DevOps basico.
+Repositorio actualizado para la Fase 1 del proyecto LogiFlow: descubrimiento DDD, piloto REST de flota, piloto SOAP de taller y pipeline DevOps basico.
 
 ## Alcance exacto
 
