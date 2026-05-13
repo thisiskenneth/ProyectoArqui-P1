@@ -11,6 +11,18 @@ services:
     volumes:
       - pgdata-flota:/var/lib/postgresql/data
 
+  db-taller:
+    image: postgres:15-alpine
+    container_name: db-taller
+    environment:
+      POSTGRES_DB: tallerdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata-taller:/var/lib/postgresql/data
+
   ms-flota-rest:
     build: ./backend/ms-flota-rest
     container_name: ms-flota-rest
@@ -20,14 +32,23 @@ services:
       DB_URL: jdbc:postgresql://db-flota:5432/flotadb
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
+      TALLER_SOAP_URL: http://ms-taller-soap:8089/ws
     depends_on:
       - db-flota
+      - ms-taller-soap
 
   ms-taller-soap:
     build: ./backend/ms-taller-soap
     container_name: ms-taller-soap
     ports:
       - "8089:8089"
+    environment:
+      DB_URL: jdbc:postgresql://db-taller:5432/tallerdb
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+    depends_on:
+      - db-taller
 
 volumes:
   pgdata-flota:
+  pgdata-taller:
