@@ -7,8 +7,8 @@ Frontend creado con `npm create vite@latest frontend -- --template react-ts`.
 - CRUD de vehiculos contra `ms-flota-rest`.
 - CRUD de conductores contra `ms-flota-rest`.
 - Consulta de disponibilidad contra `ms-flota-rest`.
-- Consulta SOAP `consultarVehiculo`.
-- Registro SOAP `registrarOrdenMantenimiento`.
+- Consulta REST de mantenimiento de vehiculo.
+- Registro REST de ordenes de mantenimiento.
 
 No incluye funcionalidades de fases posteriores.
 
@@ -36,4 +36,3 @@ npm run dev
 El servidor de Vite queda en `http://localhost:5173` y usa proxy local:
 
 - `/api` hacia `http://localhost:8081`
-- `/soap` hacia `http://localhost:8089/ws`

@@ -7,7 +7,7 @@ import { VehicleSection } from "../features/fleet/components/VehicleSection";
 import { emptyDriver, emptyVehicle } from "../features/fleet/constants";
 import { WorkshopPanel } from "../features/workshop/components/WorkshopPanel";
 import { deleteDriver, deleteVehicle, getFleetAvailability, listDrivers, listVehicles, saveDriver, saveVehicle } from "../services/fleetApi";
-import { consultarVehiculo, registrarOrdenMantenimiento } from "../services/workshopSoapApi";
+import { consultarVehiculo, registrarOrdenMantenimiento } from "../services/workshopApi";
 import type { Driver, FleetAvailability, Vehicle } from "../types/fleet";
 import type { MaintenanceOrderResult, WorkshopVehicleResult } from "../types/workshop";
 import { Truck, UserCheck, Gauge, Wrench, RefreshCw, AlertCircle, CheckCircle } from "lucide-react";
@@ -22,9 +22,9 @@ export function App() {
   const [vehicleForm, setVehicleForm] = useState<Vehicle>(emptyVehicle);
   const [driverForm, setDriverForm] = useState<Driver>(emptyDriver);
   const [selectedVehicleId, setSelectedVehicleId] = useState("");
-  const [soapDescription, setSoapDescription] = useState("Revision preventiva");
-  const [soapVehicle, setSoapVehicle] = useState<WorkshopVehicleResult | null>(null);
-  const [soapOrder, setSoapOrder] = useState<MaintenanceOrderResult | null>(null);
+  const [workshopDescription, setWorkshopDescription] = useState("Revision preventiva");
+  const [workshopVehicle, setWorkshopVehicle] = useState<WorkshopVehicleResult | null>(null);
+  const [workshopOrder, setWorkshopOrder] = useState<MaintenanceOrderResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "ok" | "err" } | null>(null);
 
@@ -95,14 +95,14 @@ export function App() {
   async function queryWorkshopVehicle(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!selectedVehicleId) { showToast("Selecciona un vehículo", "err"); return; }
-    try { setSoapVehicle(await consultarVehiculo(selectedVehicleId)); showToast("Consulta de taller completada"); }
+    try { setWorkshopVehicle(await consultarVehiculo(selectedVehicleId)); showToast("Consulta de taller completada"); }
     catch (err) { showToast(err instanceof Error ? err.message : "Error consultando taller", "err"); }
   }
 
   async function registerMaintenanceOrder(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!selectedVehicleId) { showToast("Selecciona un vehículo", "err"); return; }
-    try { setSoapOrder(await registrarOrdenMantenimiento(selectedVehicleId, soapDescription)); showToast("Orden de taller registrada"); }
+    try { setWorkshopOrder(await registrarOrdenMantenimiento(selectedVehicleId, workshopDescription)); showToast("Orden de taller registrada"); }
     catch (err) { showToast(err instanceof Error ? err.message : "Error registrando orden", "err"); }
   }
 
@@ -110,7 +110,7 @@ export function App() {
     { id: "vehicles", label: "Vehículos", icon: Truck, count: totals.vehicles, color: "blue" },
     { id: "drivers", label: "Conductores", icon: UserCheck, count: totals.drivers, color: "violet" },
     { id: "availability", label: "Disponibilidad", icon: Gauge, count: totals.availableVehicles + totals.availableDrivers, color: "emerald" },
-    { id: "workshop", label: "Taller SOAP", icon: Wrench, color: "amber" }
+    { id: "workshop", label: "Taller", icon: Wrench, color: "amber" }
   ];
 
   return (
@@ -178,11 +178,11 @@ export function App() {
           <WorkshopPanel
             vehicles={vehicles}
             selectedVehicleId={selectedVehicleId}
-            description={soapDescription}
-            vehicleResult={soapVehicle}
-            orderResult={soapOrder}
+            description={workshopDescription}
+            vehicleResult={workshopVehicle}
+            orderResult={workshopOrder}
             onSelectedVehicleChange={setSelectedVehicleId}
-            onDescriptionChange={setSoapDescription}
+            onDescriptionChange={setWorkshopDescription}
             onQueryVehicle={(e) => void queryWorkshopVehicle(e)}
             onRegisterOrder={(e) => void registerMaintenanceOrder(e)}
           />

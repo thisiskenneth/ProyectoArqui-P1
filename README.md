@@ -1,6 +1,6 @@
 # LogiFlow - Fase 1
 
-Repositorio actualizado para la Fase 1 del proyecto LogiFlow: descubrimiento DDD, piloto REST de flota, piloto SOAP de taller y pipeline DevOps basico.
+Repositorio actualizado para la Fase 1 del proyecto LogiFlow: descubrimiento DDD, piloto REST de flota, piloto REST de taller y pipeline DevOps basico.
 
 ## Alcance exacto
 
@@ -8,7 +8,7 @@ Incluye como entregables de Fase 1:
 
 - Documento DDD / propuesta de arquitectura: `docs/arquitectura-ddd-fase1.md`.
 - Microservicio REST `ms-flota-rest`.
-- Microservicio SOAP `ms-taller-soap`.
+- Microservicio REST `ms-taller-soap`.
 - Pipeline GitHub Actions para compilar, probar, analizar con SonarCloud y notificar a Telegram.
 
 No incluye como entregable de Fase 1:
@@ -127,37 +127,23 @@ Endpoints:
 - `GET /api/drivers/available`
 - `GET /api/fleet/availability`
 
-Este servicio expone solo REST. No contiene SOAP, GraphQL, WebSockets ni mensajeria.
+Este servicio expone solo REST. No contiene GraphQL, WebSockets ni mensajeria.
 
 ## ms-taller-soap
 
 Puerto local: `8089`
 
-Contrato:
+Documentacion:
 
-- WSDL: `http://localhost:8089/ws/maintenance.wsdl`
-- Namespace: `http://espe.edu.ec/mstallersoap`
+- Swagger UI: `http://localhost:8089/swagger-ui.html`
+- OpenAPI JSON: `http://localhost:8089/api-docs`
 
-Operaciones:
+Endpoints:
 
-- `consultarVehiculo(matricula)`
-- `registrarOrdenMantenimiento(matricula, descripcion)`
+- `GET /api/vehiculos/{matricula}`
+- `POST /api/mantenimientos`
 
-Ejemplo de consulta SOAP:
-
-```xml
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-                  xmlns:tal="http://espe.edu.ec/mstallersoap">
-  <soapenv:Header/>
-  <soapenv:Body>
-    <tal:ConsultarVehiculoRequest>
-      <tal:matricula>ABC-1234</tal:matricula>
-    </tal:ConsultarVehiculoRequest>
-  </soapenv:Body>
-</soapenv:Envelope>
-```
-
-Este servicio expone solo SOAP. No contiene controladores REST propios, GraphQL, WebSockets ni mensajeria.
+Este servicio expone solo REST. No contiene GraphQL, WebSockets ni mensajeria.
 
 ## Pipeline Fase 1
 

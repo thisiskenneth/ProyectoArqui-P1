@@ -38,8 +38,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(buildErrorBody(ex.getMessage(), HttpStatus.CONFLICT), HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(SoapServiceUnavailableException.class)
-    public ResponseEntity<Map<String, Object>> handleSoapUnavailable(SoapServiceUnavailableException ex) {
+    @ExceptionHandler(TallerServiceUnavailableException.class)
+    public ResponseEntity<Map<String, Object>> handleTallerUnavailable(TallerServiceUnavailableException ex) {
         return new ResponseEntity<>(
                 buildErrorBody(ex.getMessage(), HttpStatus.SERVICE_UNAVAILABLE),
                 HttpStatus.SERVICE_UNAVAILABLE);

@@ -1,14 +1,14 @@
 package ec.edu.espe.msflotarest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ec.edu.espe.msflotarest.client.MaintenanceTallerClient;
+import ec.edu.espe.msflotarest.client.dto.TallerOrdenResponse;
+import ec.edu.espe.msflotarest.client.dto.TallerVehiculoResponse;
 import ec.edu.espe.msflotarest.dto.request.MaintenanceOrderRequest;
 import ec.edu.espe.msflotarest.entity.Vehicle;
 import ec.edu.espe.msflotarest.entity.VehicleStatus;
-import ec.edu.espe.msflotarest.exception.SoapServiceUnavailableException;
+import ec.edu.espe.msflotarest.exception.TallerServiceUnavailableException;
 import ec.edu.espe.msflotarest.repository.VehicleRepository;
-import ec.edu.espe.msflotarest.soap.MaintenanceSoapClient;
-import ec.edu.espe.msflotarest.soap.model.ConsultarVehiculoResponse;
-import ec.edu.espe.msflotarest.soap.model.RegistrarOrdenMantenimientoResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ class VehicleMaintenanceControllerIntegrationTest {
     private VehicleRepository vehicleRepository;
 
     @MockitoBean
-    private MaintenanceSoapClient maintenanceSoapClient;
+    private MaintenanceTallerClient maintenanceTallerClient;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -60,13 +60,10 @@ class VehicleMaintenanceControllerIntegrationTest {
     }
 
     @Test
-    void getMaintenanceInfo_returnsDataFromSoap() throws Exception {
-        ConsultarVehiculoResponse soap = new ConsultarVehiculoResponse();
-        soap.setMatricula("MNT-PLATE");
-        soap.setEstado("DISPONIBLE");
-        soap.setUltimoMantenimiento("2026-01-10");
-        soap.setObservaciones("Todo OK");
-        when(maintenanceSoapClient.consultar("MNT-PLATE")).thenReturn(soap);
+    void getMaintenanceInfo_returnsDataFromTaller() throws Exception {
+        TallerVehiculoResponse taller = new TallerVehiculoResponse(
+                "MNT-PLATE", "DISPONIBLE", "2026-01-10", "Todo OK");
+        when(maintenanceTallerClient.consultar("MNT-PLATE")).thenReturn(taller);
 
         mockMvc.perform(get("/api/vehicles/{id}/maintenance", persistedVehicle.getId()))
                 .andExpect(status().isOk())
@@ -75,7 +72,7 @@ class VehicleMaintenanceControllerIntegrationTest {
                 .andExpect(jsonPath("$.lastMaintenance").value("2026-01-10"))
                 .andExpect(jsonPath("$.notes").value("Todo OK"));
 
-        verify(maintenanceSoapClient).consultar("MNT-PLATE");
+        verify(maintenanceTallerClient).consultar("MNT-PLATE");
     }
 
     @Test
@@ -85,9 +82,9 @@ class VehicleMaintenanceControllerIntegrationTest {
     }
 
     @Test
-    void getMaintenanceInfo_soapDown_returns503() throws Exception {
-        when(maintenanceSoapClient.consultar(any()))
-                .thenThrow(new SoapServiceUnavailableException("SOAP no disponible", null));
+    void getMaintenanceInfo_tallerDown_returns503() throws Exception {
+        when(maintenanceTallerClient.consultar(any()))
+                .thenThrow(new TallerServiceUnavailableException("Taller no disponible", null));
 
         mockMvc.perform(get("/api/vehicles/{id}/maintenance", persistedVehicle.getId()))
                 .andExpect(status().isServiceUnavailable())
@@ -96,12 +93,10 @@ class VehicleMaintenanceControllerIntegrationTest {
     }
 
     @Test
-    void createMaintenanceOrder_returnsCreatedWithSoapPayload() throws Exception {
-        RegistrarOrdenMantenimientoResponse soap = new RegistrarOrdenMantenimientoResponse();
-        soap.setCodigoOrden("ORD-ABC123");
-        soap.setFechaIngreso("2026-05-13T11:00:00");
-        soap.setMensaje("Orden creada");
-        when(maintenanceSoapClient.registrar(eq("MNT-PLATE"), eq("Cambio de aceite"))).thenReturn(soap);
+    void createMaintenanceOrder_returnsCreatedWithTallerPayload() throws Exception {
+        TallerOrdenResponse taller = new TallerOrdenResponse(
+                "ORD-ABC123", "2026-05-13T11:00:00", "Orden creada");
+        when(maintenanceTallerClient.registrar(eq("MNT-PLATE"), eq("Cambio de aceite"))).thenReturn(taller);
 
         MaintenanceOrderRequest body = new MaintenanceOrderRequest();
         body.setDescripcion("Cambio de aceite");
@@ -114,7 +109,7 @@ class VehicleMaintenanceControllerIntegrationTest {
                 .andExpect(jsonPath("$.fechaIngreso").value("2026-05-13T11:00:00"))
                 .andExpect(jsonPath("$.mensaje").value("Orden creada"));
 
-        verify(maintenanceSoapClient).registrar("MNT-PLATE", "Cambio de aceite");
+        verify(maintenanceTallerClient).registrar("MNT-PLATE", "Cambio de aceite");
     }
 
     @Test
@@ -140,9 +135,9 @@ class VehicleMaintenanceControllerIntegrationTest {
     }
 
     @Test
-    void createMaintenanceOrder_soapDown_returns503() throws Exception {
-        when(maintenanceSoapClient.registrar(any(), any()))
-                .thenThrow(new SoapServiceUnavailableException("SOAP caído", null));
+    void createMaintenanceOrder_tallerDown_returns503() throws Exception {
+        when(maintenanceTallerClient.registrar(any(), any()))
+                .thenThrow(new TallerServiceUnavailableException("Taller caído", null));
 
         MaintenanceOrderRequest body = new MaintenanceOrderRequest();
         body.setDescripcion("Revisión");

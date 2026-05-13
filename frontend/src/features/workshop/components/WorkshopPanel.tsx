@@ -26,22 +26,21 @@ export function WorkshopPanel({ vehicles, selectedVehicleId, description, vehicl
         </div>
         <div>
           <h2 className="text-lg font-semibold text-white">Taller</h2>
-          <p className="text-sm text-slate-400">REST → SOAP vía ms-flota-rest → ms-taller-soap</p>
+          <p className="text-sm text-slate-400">REST via ms-flota-rest y servicio de taller</p>
         </div>
       </div>
 
       {noVehicles && (
         <div className="mb-4 bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 text-sm text-amber-200">
-          Crea un vehículo primero en la pestaña "Vehículos" para poder consultar o registrar órdenes.
+          Crea un vehiculo primero en la pestana "Vehiculos" para poder consultar o registrar ordenes.
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Consultar */}
         <div className="space-y-4">
           <form onSubmit={onQueryVehicle} className="space-y-3">
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5">Vehículo</label>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5">Vehiculo</label>
               <select
                 required
                 disabled={noVehicles}
@@ -49,10 +48,10 @@ export function WorkshopPanel({ vehicles, selectedVehicleId, description, vehicl
                 value={selectedVehicleId}
                 onChange={(e) => onSelectedVehicleChange(e.target.value)}
               >
-                <option value="">— Selecciona un vehículo —</option>
+                <option value="">Selecciona un vehiculo</option>
                 {vehicles.map((v) => (
                   <option key={v.id} value={v.id ?? ""}>
-                    {v.plate} · {v.type} · {v.status}
+                    {v.plate} | {v.type} | {v.status}
                   </option>
                 ))}
               </select>
@@ -67,11 +66,11 @@ export function WorkshopPanel({ vehicles, selectedVehicleId, description, vehicl
           </form>
           {vehicleResult && (
             <div className="bg-white/[0.04] border border-amber-500/20 rounded-xl p-4 space-y-2">
-              <p className="text-xs text-slate-400">Respuesta del taller (vía REST)</p>
+              <p className="text-xs text-slate-400">Respuesta del taller via REST</p>
               <div className="grid grid-cols-2 gap-2 text-sm">
-                <span className="text-slate-400">Matrícula:</span><span className="text-white font-mono">{vehicleResult.matricula}</span>
+                <span className="text-slate-400">Matricula:</span><span className="text-white font-mono">{vehicleResult.matricula}</span>
                 <span className="text-slate-400">Estado:</span><span className="text-emerald-400 font-medium">{vehicleResult.estado}</span>
-                <span className="text-slate-400">Último mant.:</span><span className="text-white">{vehicleResult.ultimoMantenimiento}</span>
+                <span className="text-slate-400">Ultimo mant.:</span><span className="text-white">{vehicleResult.ultimoMantenimiento}</span>
                 <span className="text-slate-400 col-span-2">Observaciones:</span>
                 <span className="text-white col-span-2 text-xs">{vehicleResult.observaciones}</span>
               </div>
@@ -79,15 +78,14 @@ export function WorkshopPanel({ vehicles, selectedVehicleId, description, vehicl
           )}
         </div>
 
-        {/* Registrar */}
         <div className="space-y-4">
           <form onSubmit={onRegisterOrder} className="space-y-3">
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5">Descripción de mantenimiento</label>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5">Descripcion de mantenimiento</label>
               <textarea
                 required
                 rows={3}
-                placeholder="Revisión preventiva..."
+                placeholder="Revision preventiva..."
                 disabled={noVehicles}
                 className="w-full bg-white/[0.06] border border-white/[0.1] rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-amber-500/50 transition-all resize-none disabled:opacity-50"
                 value={description}
@@ -104,9 +102,9 @@ export function WorkshopPanel({ vehicles, selectedVehicleId, description, vehicl
           </form>
           {orderResult && (
             <div className="bg-white/[0.04] border border-emerald-500/20 rounded-xl p-4 space-y-2">
-              <p className="text-xs text-emerald-400 font-medium">✓ Orden registrada</p>
+              <p className="text-xs text-emerald-400 font-medium">Orden registrada</p>
               <div className="grid grid-cols-2 gap-2 text-sm">
-                <span className="text-slate-400">Código:</span><span className="text-white font-mono">{orderResult.codigoOrden}</span>
+                <span className="text-slate-400">Codigo:</span><span className="text-white font-mono">{orderResult.codigoOrden}</span>
                 <span className="text-slate-400">Fecha:</span><span className="text-white">{orderResult.fechaIngreso}</span>
                 <span className="text-slate-400 col-span-2">Mensaje:</span>
                 <span className="text-white col-span-2 text-xs">{orderResult.mensaje}</span>

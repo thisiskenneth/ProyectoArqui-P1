@@ -5,7 +5,7 @@
 Este documento cubre el descubrimiento estrategico del dominio LogiFlow solicitado para Fase 1. Describe el dominio completo para poder defender la arquitectura futura, pero la implementacion de esta rama se limita a dos pilotos:
 
 - `ms-flota-rest`: API REST para flota.
-- `ms-taller-soap`: API SOAP para taller.
+- `ms-taller-soap`: API REST para taller.
 
 Los demas contextos se documentan como parte del analisis DDD, no como servicios ejecutables de Fase 1.
 
@@ -25,7 +25,7 @@ Gestion de la cadena de entrega: asignacion inteligente de pedidos a vehiculos c
 ### Subdominios genericos
 
 - Autenticacion y autorizacion.
-- Integracion con taller mecanico mediante SOAP.
+- Integracion con taller mecanico mediante REST.
 
 ## 3. Bounded Contexts
 
@@ -35,7 +35,7 @@ Gestion de la cadena de entrega: asignacion inteligente de pedidos a vehiculos c
 | Ruteo y Asignacion | Core Domain | Asignar pedidos a vehiculos y calcular rutas | Modelado, no implementado |
 | Seguimiento | Core relacionado | Posicion y trazabilidad en tiempo real | Modelado, no implementado |
 | Flota | Soporte | Vehiculos, conductores, disponibilidad y caracteristicas tecnicas | Implementado como `ms-flota-rest` |
-| Taller | Generico / ACL | Contrato SOAP para taller mecanico externo | Implementado como `ms-taller-soap` |
+| Taller | Generico / ACL | Contrato REST para taller mecanico externo | Implementado como `ms-taller-soap` |
 | Clientes | Soporte | Datos maestros de clientes y cuentas | Modelado, no implementado |
 | Facturacion | Soporte | Tarifas, costos y facturas | Modelado, no implementado |
 | Notificaciones | Soporte | Avisos por canal ante eventos relevantes | Modelado, no implementado |
@@ -183,7 +183,7 @@ Gestion de la cadena de entrega: asignacion inteligente de pedidos a vehiculos c
 | Pedidos - Ruteo | Customer/Supplier | Ruteo consume pedidos creados y devuelve asignaciones. Pedidos es proveedor del ciclo de pedido. |
 | Ruteo - Seguimiento | Customer/Supplier | Seguimiento consume envios activos para reportar posiciones y ETA. |
 | Pedidos - Facturacion | Conformist | Facturacion adopta el modelo de eventos de Pedidos para facturar entregas. |
-| Taller - Flota | Anticorruption Layer | Taller traduce el contrato SOAP externo al lenguaje interno de mantenimiento de flota. |
+| Taller - Flota | Anticorruption Layer | Taller traduce el contrato REST externo al lenguaje interno de mantenimiento de flota. |
 | Notificaciones - Pedidos/Ruteo/Seguimiento | Published Language | Notificaciones interpreta eventos publicados con nombres de dominio acordados. |
 | GraphQL Gateway - proveedores | Customer/Supplier | Gateway actua como cliente de servicios REST y de lectura para armar vistas de frontend. |
 | Autenticacion - servicios | Shared Kernel minimo | Los servicios comparten conceptos de usuario, rol y token sin compartir logica de negocio. |
@@ -191,7 +191,7 @@ Gestion de la cadena de entrega: asignacion inteligente de pedidos a vehiculos c
 ## 8. Decisiones de arquitectura para Fase 1
 
 - `ms-flota-rest` expone solo REST y documenta su contrato con Swagger/OpenAPI.
-- `ms-taller-soap` expone solo SOAP y genera WSDL desde `maintenance.xsd`.
+- `ms-taller-soap` expone solo REST y documenta su contrato con Swagger/OpenAPI.
 - No se ejecutan buses de eventos, gateway GraphQL, WebSockets ni Kubernetes en esta rama.
 - El directorio `frontend/`, si permanece en el repositorio, queda fuera del entregable de Fase 1 y no participa en el pipeline ni en `docker-compose.yml`.
 - El pipeline valida unicamente los dos servicios de Fase 1.
@@ -208,14 +208,13 @@ Gestion de la cadena de entrega: asignacion inteligente de pedidos a vehiculos c
   - `/api/drivers/available`
   - `/api/fleet/availability`
 
-### SOAP Taller
+### REST Taller
 
-- WSDL: `/ws/maintenance.wsdl`.
-- `consultarVehiculo(matricula)`.
-- `registrarOrdenMantenimiento(matricula, descripcion)`.
+- Consulta de vehiculo: `/api/vehiculos/{matricula}`.
+- Registro de orden de mantenimiento: `/api/mantenimientos`.
 
 ## 10. Riesgos y supuestos
 
 - La propuesta estrategica incluye contextos futuros porque Fase 1 lo exige, pero su implementacion queda fuera de esta rama.
-- El servicio SOAP simula persistencia de ordenes; Fase 1 solo exige exponer contrato y operacion piloto.
+- El servicio de taller simula persistencia de ordenes; Fase 1 solo exige exponer contrato y operacion piloto.
 - SonarCloud y Telegram dependen de secretos configurados en GitHub.

@@ -10,11 +10,6 @@ export default defineConfig({
       "/api": {
         target: "http://localhost:8081",
         changeOrigin: true
-      },
-      "/soap": {
-        target: "http://localhost:8089",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/soap/, "/ws")
       }
     }
   }

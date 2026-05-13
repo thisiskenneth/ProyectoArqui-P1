@@ -1,8 +1,8 @@
 package ec.edu.espe.mstallersoap.service;
 
+import ec.edu.espe.mstallersoap.dto.VehiculoMaintenanceDto;
+import ec.edu.espe.mstallersoap.dto.response.MantenimientoResponse;
 import ec.edu.espe.mstallersoap.entity.MaintenanceOrder;
-import ec.edu.espe.mstallersoap.model.ConsultarVehiculoResponse;
-import ec.edu.espe.mstallersoap.model.RegistrarOrdenMantenimientoResponse;
 import ec.edu.espe.mstallersoap.repository.MaintenanceOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,27 +22,22 @@ public class MaintenanceService {
     private final MaintenanceOrderRepository repository;
 
     @Transactional(readOnly = true)
-    public ConsultarVehiculoResponse consultar(String matricula) {
-        ConsultarVehiculoResponse response = new ConsultarVehiculoResponse();
-        response.setMatricula(matricula);
-
-        repository.findFirstByMatriculaOrderByFechaIngresoDesc(matricula)
-                .ifPresentOrElse(
-                        order -> {
-                            response.setEstado("EN MANTENIMIENTO");
-                            response.setUltimoMantenimiento(order.getFechaIngreso().toLocalDate().format(DATE_FORMATTER));
-                            response.setObservaciones("Última orden: " + order.getCodigoOrden() + " - " + order.getDescripcion());
-                        },
-                        () -> {
-                            response.setEstado("DISPONIBLE");
-                            response.setUltimoMantenimiento(SIN_REGISTRO);
-                            response.setObservaciones("Sin órdenes de mantenimiento registradas para esta matrícula.");
-                        });
-        return response;
+    public VehiculoMaintenanceDto consultar(String matricula) {
+        return repository.findFirstByMatriculaOrderByFechaIngresoDesc(matricula)
+                .map(order -> new VehiculoMaintenanceDto(
+                        matricula,
+                        "EN MANTENIMIENTO",
+                        order.getFechaIngreso().toLocalDate().format(DATE_FORMATTER),
+                        "Ultima orden: " + order.getCodigoOrden() + " - " + order.getDescripcion()))
+                .orElseGet(() -> new VehiculoMaintenanceDto(
+                        matricula,
+                        "DISPONIBLE",
+                        SIN_REGISTRO,
+                        "Sin ordenes de mantenimiento registradas para esta matricula."));
     }
 
     @Transactional
-    public RegistrarOrdenMantenimientoResponse registrar(String matricula, String descripcion) {
+    public MantenimientoResponse registrar(String matricula, String descripcion) {
         String detalle = (descripcion == null || descripcion.isBlank()) ? "sin descripcion" : descripcion;
         LocalDateTime now = LocalDateTime.now();
         String codigoOrden = "ORD-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
@@ -55,10 +50,9 @@ public class MaintenanceService {
                 .build();
         MaintenanceOrder saved = repository.save(order);
 
-        RegistrarOrdenMantenimientoResponse response = new RegistrarOrdenMantenimientoResponse();
-        response.setCodigoOrden(saved.getCodigoOrden());
-        response.setFechaIngreso(saved.getFechaIngreso().toString());
-        response.setMensaje("Orden registrada con exito para el vehiculo " + matricula + " (" + detalle + ")");
-        return response;
+        return new MantenimientoResponse(
+                saved.getCodigoOrden(),
+                saved.getFechaIngreso().toString(),
+                "Orden registrada con exito para el vehiculo " + matricula + " (" + detalle + ")");
     }
 }

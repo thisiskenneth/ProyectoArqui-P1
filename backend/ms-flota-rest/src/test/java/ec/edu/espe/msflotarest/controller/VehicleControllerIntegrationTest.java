@@ -1,12 +1,12 @@
 package ec.edu.espe.msflotarest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ec.edu.espe.msflotarest.client.MaintenanceTallerClient;
+import ec.edu.espe.msflotarest.client.dto.TallerOrdenResponse;
 import ec.edu.espe.msflotarest.dto.VehicleDto;
 import ec.edu.espe.msflotarest.entity.Vehicle;
 import ec.edu.espe.msflotarest.entity.VehicleStatus;
 import ec.edu.espe.msflotarest.repository.VehicleRepository;
-import ec.edu.espe.msflotarest.soap.MaintenanceSoapClient;
-import ec.edu.espe.msflotarest.soap.model.RegistrarOrdenMantenimientoResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,18 +45,16 @@ class VehicleControllerIntegrationTest {
     private VehicleRepository vehicleRepository;
 
     @MockitoBean
-    private MaintenanceSoapClient maintenanceSoapClient;
+    private MaintenanceTallerClient maintenanceTallerClient;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
         vehicleRepository.deleteAll();
-        RegistrarOrdenMantenimientoResponse soapResponse = new RegistrarOrdenMantenimientoResponse();
-        soapResponse.setCodigoOrden("ORD-TEST1");
-        soapResponse.setFechaIngreso("2026-05-13T10:00:00");
-        soapResponse.setMensaje("ok");
-        when(maintenanceSoapClient.registrar(any(), any())).thenReturn(soapResponse);
+        TallerOrdenResponse tallerResponse = new TallerOrdenResponse(
+                "ORD-TEST1", "2026-05-13T10:00:00", "ok");
+        when(maintenanceTallerClient.registrar(any(), any())).thenReturn(tallerResponse);
     }
 
     private VehicleDto sampleVehicle(String plate, VehicleStatus status) {
@@ -153,11 +151,11 @@ class VehicleControllerIntegrationTest {
                 .andExpect(jsonPath("$.status").value("MAINTENANCE"))
                 .andExpect(jsonPath("$.maintenanceOrderCode").value("ORD-TEST1"));
 
-        verify(maintenanceSoapClient).registrar(eq("OLD-001"), any());
+        verify(maintenanceTallerClient).registrar(eq("OLD-001"), any());
     }
 
     @Test
-    void update_withoutMaintenanceTransition_doesNotCallSoap() throws Exception {
+    void update_withoutMaintenanceTransition_doesNotCallTaller() throws Exception {
         Vehicle saved = vehicleRepository.save(Vehicle.builder()
                 .plate("KEEP-1")
                 .type("Auto")
@@ -173,7 +171,7 @@ class VehicleControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.maintenanceOrderCode").doesNotExist());
 
-        verify(maintenanceSoapClient, never()).registrar(any(), any());
+        verify(maintenanceTallerClient, never()).registrar(any(), any());
     }
 
     @Test
@@ -193,7 +191,7 @@ class VehicleControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.maintenanceOrderCode").doesNotExist());
 
-        verify(maintenanceSoapClient, never()).registrar(any(), any());
+        verify(maintenanceTallerClient, never()).registrar(any(), any());
     }
 
     @Test

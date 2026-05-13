@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class MsTallerSoapApplicationTests {
+class MsTallerRestApplicationTests {
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -18,6 +18,6 @@ class MsTallerSoapApplicationTests {
     @Test
     void contextLoads() {
         assertThat(applicationContext).isNotNull();
-        assertThat(applicationContext.getBean(MsTallerSoapApplication.class)).isNotNull();
+        assertThat(applicationContext.getBean(MsTallerRestApplication.class)).isNotNull();
     }
 }

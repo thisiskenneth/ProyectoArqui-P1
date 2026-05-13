@@ -1,13 +1,13 @@
 package ec.edu.espe.msflotarest.controller;
 
+import ec.edu.espe.msflotarest.client.MaintenanceTallerClient;
+import ec.edu.espe.msflotarest.client.dto.TallerOrdenResponse;
+import ec.edu.espe.msflotarest.client.dto.TallerVehiculoResponse;
 import ec.edu.espe.msflotarest.dto.MaintenanceInfoDto;
 import ec.edu.espe.msflotarest.dto.VehicleDto;
 import ec.edu.espe.msflotarest.dto.request.MaintenanceOrderRequest;
 import ec.edu.espe.msflotarest.dto.response.MaintenanceOrderResponse;
 import ec.edu.espe.msflotarest.service.VehicleService;
-import ec.edu.espe.msflotarest.soap.MaintenanceSoapClient;
-import ec.edu.espe.msflotarest.soap.model.ConsultarVehiculoResponse;
-import ec.edu.espe.msflotarest.soap.model.RegistrarOrdenMantenimientoResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,17 +27,17 @@ import java.util.UUID;
 public class VehicleMaintenanceController {
 
     private final VehicleService vehicleService;
-    private final MaintenanceSoapClient maintenanceSoapClient;
+    private final MaintenanceTallerClient maintenanceTallerClient;
 
     @GetMapping("/maintenance")
     public ResponseEntity<MaintenanceInfoDto> getMaintenanceInfo(@PathVariable UUID id) {
         VehicleDto vehicle = vehicleService.findById(id);
-        ConsultarVehiculoResponse soapResponse = maintenanceSoapClient.consultar(vehicle.getPlate());
+        TallerVehiculoResponse tallerResponse = maintenanceTallerClient.consultar(vehicle.getPlate());
         return ResponseEntity.ok(new MaintenanceInfoDto(
-                soapResponse.getMatricula(),
-                soapResponse.getEstado(),
-                soapResponse.getUltimoMantenimiento(),
-                soapResponse.getObservaciones()));
+                tallerResponse.getMatricula(),
+                tallerResponse.getEstado(),
+                tallerResponse.getUltimoMantenimiento(),
+                tallerResponse.getObservaciones()));
     }
 
     @PostMapping("/maintenance-orders")
@@ -45,12 +45,12 @@ public class VehicleMaintenanceController {
             @PathVariable UUID id,
             @Valid @RequestBody MaintenanceOrderRequest body) {
         VehicleDto vehicle = vehicleService.findById(id);
-        RegistrarOrdenMantenimientoResponse soapResponse = maintenanceSoapClient.registrar(
+        TallerOrdenResponse tallerResponse = maintenanceTallerClient.registrar(
                 vehicle.getPlate(), body.getDescripcion());
         MaintenanceOrderResponse response = new MaintenanceOrderResponse(
-                soapResponse.getCodigoOrden(),
-                soapResponse.getFechaIngreso(),
-                soapResponse.getMensaje());
+                tallerResponse.getCodigoOrden(),
+                tallerResponse.getFechaIngreso(),
+                tallerResponse.getMensaje());
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

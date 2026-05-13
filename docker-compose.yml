@@ -32,7 +32,7 @@ services:
       DB_URL: jdbc:postgresql://db-flota:5432/flotadb
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
-      TALLER_SOAP_URL: http://ms-taller-soap:8089/ws
+      TALLER_API_URL: http://ms-taller-soap:8089/api
     depends_on:
       - db-flota
       - ms-taller-soap

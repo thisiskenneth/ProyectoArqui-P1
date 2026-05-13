@@ -1,13 +1,13 @@
 package ec.edu.espe.msflotarest.service;
 
+import ec.edu.espe.msflotarest.client.MaintenanceTallerClient;
+import ec.edu.espe.msflotarest.client.dto.TallerOrdenResponse;
 import ec.edu.espe.msflotarest.dto.VehicleDto;
 import ec.edu.espe.msflotarest.entity.Vehicle;
 import ec.edu.espe.msflotarest.entity.VehicleStatus;
 import ec.edu.espe.msflotarest.exception.DuplicateResourceException;
 import ec.edu.espe.msflotarest.exception.ResourceNotFoundException;
 import ec.edu.espe.msflotarest.repository.VehicleRepository;
-import ec.edu.espe.msflotarest.soap.MaintenanceSoapClient;
-import ec.edu.espe.msflotarest.soap.model.RegistrarOrdenMantenimientoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,7 @@ public class VehicleService {
     private static final String AUTO_MAINTENANCE_DESCRIPTION = "Ingreso a mantenimiento programado";
 
     private final VehicleRepository vehicleRepository;
-    private final MaintenanceSoapClient maintenanceSoapClient;
+    private final MaintenanceTallerClient maintenanceTallerClient;
 
     public List<VehicleDto> findAll() {
         return vehicleRepository.findAll().stream()
@@ -65,7 +65,7 @@ public class VehicleService {
         VehicleDto result = convertToDto(saved);
 
         if (dto.getStatus() == VehicleStatus.MAINTENANCE && previousStatus != VehicleStatus.MAINTENANCE) {
-            RegistrarOrdenMantenimientoResponse order = maintenanceSoapClient.registrar(
+            TallerOrdenResponse order = maintenanceTallerClient.registrar(
                     saved.getPlate(), AUTO_MAINTENANCE_DESCRIPTION);
             result.setMaintenanceOrderCode(order.getCodigoOrden());
         }
