@@ -14,30 +14,28 @@ import org.springframework.ws.client.core.WebServiceTemplate;
 @RequiredArgsConstructor
 public class MaintenanceSoapClient {
 
+    private static final String UNAVAILABLE_MESSAGE = "El servicio de taller (SOAP) no está disponible.";
+
     private final WebServiceTemplate maintenanceWebServiceTemplate;
 
     public ConsultarVehiculoResponse consultar(String matricula) {
         ConsultarVehiculoRequest request = new ConsultarVehiculoRequest();
         request.setMatricula(matricula);
-        try {
-            return (ConsultarVehiculoResponse)
-                    maintenanceWebServiceTemplate.marshalSendAndReceive(request);
-        } catch (WebServiceIOException ex) {
-            throw new SoapServiceUnavailableException(
-                    "El servicio de taller (SOAP) no está disponible.", ex);
-        }
+        return send(request, ConsultarVehiculoResponse.class);
     }
 
     public RegistrarOrdenMantenimientoResponse registrar(String matricula, String descripcion) {
         RegistrarOrdenMantenimientoRequest request = new RegistrarOrdenMantenimientoRequest();
         request.setMatricula(matricula);
         request.setDescripcion(descripcion);
+        return send(request, RegistrarOrdenMantenimientoResponse.class);
+    }
+
+    private <T> T send(Object request, Class<T> responseType) {
         try {
-            return (RegistrarOrdenMantenimientoResponse)
-                    maintenanceWebServiceTemplate.marshalSendAndReceive(request);
+            return responseType.cast(maintenanceWebServiceTemplate.marshalSendAndReceive(request));
         } catch (WebServiceIOException ex) {
-            throw new SoapServiceUnavailableException(
-                    "El servicio de taller (SOAP) no está disponible.", ex);
+            throw new SoapServiceUnavailableException(UNAVAILABLE_MESSAGE, ex);
         }
     }
 }
