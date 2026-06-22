@@ -1,0 +1,102 @@
+@base = http://localhost
+@rabbit = http://localhost:15672
+
+### 1. Crear un vehículo disponible (Fase 1)
+POST {{base}}/api/vehicles
+Content-Type: application/json
+
+{
+  "plate": "PBA-2040",
+  "type": "Furgoneta",
+  "capacityKg": 1200,
+  "autonomyKm": 450,
+  "status": "AVAILABLE"
+}
+
+### 2. Registrar usuario
+POST {{base}}/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "operador",
+  "password": "LogiFlow-2026",
+  "email": "operador@logiflow.ec",
+  "roles": ["OPERATOR"]
+}
+
+### 3. Login JWT
+POST {{base}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "operador",
+  "password": "LogiFlow-2026"
+}
+
+### 4. Crear cuenta corporativa
+POST {{base}}/api/corporate-accounts
+Content-Type: application/json
+
+{
+  "ruc": "1790012345001",
+  "businessName": "ESPE Logística",
+  "creditLimit": 10000,
+  "industry": "Educación"
+}
+
+### 5. Crear cliente
+POST {{base}}/api/clients
+Content-Type: application/json
+
+{
+  "firstName": "Ana",
+  "lastName": "Paredes",
+  "email": "ana@example.com",
+  "phone": "0999999999",
+  "address": "Sangolquí",
+  "corporateAccountId": 1
+}
+
+### 6. Crear pedido mediante GraphQL
+POST {{base}}/graphql
+Content-Type: application/json
+
+{
+  "query": "mutation Crear($input: PedidoInput!) { crearPedido(input: $input) { id clienteId status origin destination } }",
+  "variables": {
+    "input": {
+      "clienteId": "1",
+      "customerEmail": "ana@example.com",
+      "items": ["CAJA-001"],
+      "total": 25.5,
+      "weightKg": 8.0,
+      "geographicLevel": "LOCAL",
+      "vehicleType": "Furgoneta",
+      "origin": "Sangolquí",
+      "destination": "Quito"
+    }
+  }
+}
+
+### 7. Evidenciar asignación automática después de unos segundos
+GET {{base}}/api/shipments
+
+### 8. Publicar posicion.actualizada desde el simulador RabbitMQ
+POST {{rabbit}}/api/exchanges/%2F/logiflow.exchange/publish
+Authorization: Basic Z3Vlc3Q6Z3Vlc3Q=
+Content-Type: application/json
+
+{
+  "properties": {},
+  "routing_key": "posicion.actualizada",
+  "payload": "{\"shipmentId\":\"1\",\"orderId\":\"1\",\"lat\":-0.3149,\"lng\":-78.4438,\"speed\":42.0,\"eta\":\"2026-06-22T13:00:00-05:00\",\"timestamp\":\"2026-06-22T12:00:00-05:00\"}",
+  "payload_encoding": "string"
+}
+
+### 9. Query agregada con última posición
+POST {{base}}/graphql
+Content-Type: application/json
+
+{
+  "query": "{ envio(id: \"1\") { id orderId vehiclePlate status lastPosition { lat lng speed eta timestamp } } }"
+}

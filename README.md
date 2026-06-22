@@ -1,245 +1,140 @@
-# LogiFlow - Fase 1
+# LogiFlow - Fase 2
 
-Repositorio actualizado para la Fase 1 del proyecto LogiFlow: descubrimiento DDD, piloto REST de flota, piloto REST de taller y pipeline DevOps basico.
+Backend esencial de LogiFlow con REST, GraphQL, RabbitMQ y seguimiento por WebSocket. Conserva los pilotos de Fase 1 y excluye Kubernetes por decisión del proyecto.
 
-## Alcance exacto
+## Alcance
 
-Incluye como entregables de Fase 1:
+| Componente | API | Puerto | Responsabilidad |
+| --- | --- | ---: | --- |
+| ms-flota-rest | REST | 8081 | Vehículos, conductores y disponibilidad |
+| ms-taller-rest | REST heredado de Fase 1 | 8089 | Consulta y mantenimiento |
+| ms-auth | REST | 8088 | Registro, login y verificación JWT |
+| ms-clientes | REST | 8086 | CRUD de clientes y cuentas corporativas |
+| ms-pedidos | REST + eventos | 8087 | Gestión de pedidos y eventos |
+| ms-ruteo | REST + eventos | 8082 | Asignación y consulta de envíos |
+| ms-seguimiento | WebSocket solamente | 8083 | Retransmisión de posiciones STOMP |
+| graphql-gateway | GraphQL | 8080 | BFF de pedidos y envíos |
+| RabbitMQ | AMQP / Management | 5672 / 15672 | Bus topic de eventos |
+| Nginx | HTTP / WebSocket | 80 | Entrada unificada sin Kubernetes |
 
-- Documento DDD / propuesta de arquitectura: `docs/arquitectura-ddd-fase1.md`.
-- Microservicio REST `ms-flota-rest`.
-- Microservicio REST `ms-taller-rest`.
-- Pipeline GitHub Actions para compilar, probar, analizar con SonarCloud y notificar a Telegram.
+No se incluyen manifiestos Kubernetes, Helm, Minikube, Kind ni K3s. Facturación, notificaciones y frontend completo pertenecen a Fase 3.
 
-No incluye como entregable de Fase 1:
+## Requisitos
 
-- Frontend.
-- GraphQL.
-- WebSockets.
-- RabbitMQ.
-- Kubernetes o Helm.
-- API Gateway externo.
-- Autenticacion.
-- Clientes.
-- Pedidos.
-- Ruteo ejecutable.
-- Seguimiento ejecutable.
-- Facturacion.
-- Notificaciones.
-- Despliegue cloud.
-
-El directorio `frontend/` puede permanecer en el repositorio como trabajo fuera de alcance, pero no participa en `docker-compose.yml`, no se valida en el pipeline de Fase 1 y no cuenta como entregable de esta fase.
-
-## Estructura Fase 1
-
-```text
-backend/
-  ms-flota-rest/
-  ms-taller-soap/
-docs/
-  arquitectura-ddd-fase1.md
-  devops-fase1.md
-.github/workflows/backend-ci.yml
-docker-compose.yml
-sonar-project.properties
-README.md
-```
-
-## Requisitos locales
-
-- JDK 21.
-- Docker y Docker Compose, solo si se desea ejecutar los dos pilotos con contenedores.
+- JDK 21 (incluido el wrapper Maven `mvnw`).
+- PostgreSQL local en `localhost:5432` (usuario `postgres`, contraseña `1234`) para la ejecución local de los microservicios.
+- Docker Desktop para levantar RabbitMQ (y, opcionalmente, la integración completa).
+- IntelliJ IDEA (opcional, recomendado para ejecutar los servicios).
 - Git.
 
-## Ejecucion local con Docker Compose
+## Ejecución local (microservicios locales + PostgreSQL local + RabbitMQ en Docker)
 
-```bash
+En esta modalidad los **microservicios corren en local** (IntelliJ o `mvnw`), la **base de datos es tu PostgreSQL local** y solo **RabbitMQ se ejecuta en Docker**. Cada microservicio con persistencia usa su propia base (database-per-service):
+
+| Servicio | Puerto | Base PostgreSQL | Bus |
+| --- | ---: | --- | --- |
+| ms-flota-rest | 8081 | `flotadb` | - |
+| ms-taller-soap | 8089 | `tallerdb` | - |
+| ms-auth | 8088 | `authdb` | - |
+| ms-clientes | 8086 | `clientesdb` | - |
+| ms-pedidos | 8087 | `pedidosdb` | RabbitMQ |
+| ms-ruteo | 8082 | `ruteodb` | RabbitMQ |
+| ms-seguimiento | 8083 | H2 en memoria (relay efímero) | RabbitMQ |
+| graphql-gateway | 8080 | sin base | RabbitMQ |
+
+### 1. Crear las bases en PostgreSQL local
+
+~~~powershell
+& "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -h localhost -p 5432 -f infrastructure\local\create-databases.sql
+~~~
+
+(Ajusta la ruta de `psql.exe` a tu versión. Las credenciales por defecto son `postgres` / `1234`; cámbialas con las variables de entorno `DB_USERNAME` y `DB_PASSWORD` si tu instalación usa otras.)
+
+### 2. Levantar solo RabbitMQ en Docker
+
+~~~powershell
+docker compose up -d rabbitmq
+~~~
+
+RabbitMQ Management queda en http://localhost:15672 (guest / guest).
+
+### 3. Ejecutar los microservicios desde IntelliJ
+
+1. `File > Open` y selecciona `backend/pom.xml` (es un POM agregador que importa los 8 microservicios como un único proyecto multimódulo).
+2. Espera a que IntelliJ resuelva las dependencias Maven.
+3. Ejecuta cada servicio con el botón ▶ sobre su clase `*Application` (por ejemplo `MsPedidosApplication`). El plugin de Spring Boot crea la configuración de ejecución automáticamente.
+
+Los valores por defecto ya apuntan a `localhost:5432` (PostgreSQL) y `localhost:5672` (RabbitMQ), por lo que no necesitas configurar variables de entorno.
+
+### 4. Alternativa por terminal (sin IntelliJ)
+
+~~~powershell
+# en una terminal por servicio
+Push-Location backend\ms-pedidos ; .\mvnw.cmd spring-boot:run ; Pop-Location
+~~~
+
+## Pruebas (sin PostgreSQL ni RabbitMQ)
+
+Las pruebas usan el perfil `test` (H2 en memoria) y no requieren PostgreSQL ni RabbitMQ, igual que en CI:
+
+~~~powershell
+$services = 'ms-flota-rest','ms-taller-soap','ms-auth','ms-clientes','ms-pedidos','ms-ruteo','ms-seguimiento','graphql-gateway'
+foreach ($service in $services) {
+  Push-Location "backend\$service"
+  .\mvnw.cmd test
+  Pop-Location
+}
+~~~
+
+## Arranque integrado
+
+Después de activar Docker:
+
+~~~powershell
 docker compose up -d --build
-```
+docker compose ps
+~~~
 
-Servicios publicados:
+Entrada unificada: http://localhost. RabbitMQ Management: http://localhost:15672 con guest / guest.
 
-- `ms-flota-rest`: `http://localhost:8081`
-- `ms-taller-rest`: `http://localhost:8089`
+Para detener: docker compose down. Los datos PostgreSQL se conservan en volúmenes; no use docker compose down -v en una entrega normal.
 
-Detener servicios:
+## Contratos principales
 
-```bash
-docker compose down
-```
+REST:
 
-## Ejecucion local sin Docker
+- Auth: POST /api/auth/register, POST /api/auth/login y POST /api/auth/verify?token=...
+- Clientes: CRUD en /api/clients y /api/corporate-accounts.
+- Pedidos: /api/orders; cancelación en POST /api/orders/{id}/cancel.
+- Ruteo: POST /api/shipments/assign, GET /api/shipments y GET /api/shipments/{id}.
+- Swagger directo: http://localhost:<puerto>/swagger-ui.html.
 
-Compilar y probar `ms-flota-rest`:
+GraphQL:
 
-```powershell
-Push-Location backend\ms-flota-rest
-.\mvnw.cmd test
-Pop-Location
-```
+- UI: http://localhost:8080/graphiql.
+- Endpoint unificado: POST http://localhost/graphql.
+- Queries: pedidosActivos(clienteId) y envio(id).
+- Mutations: crearPedido(input) y cancelarPedido(id).
 
-Ejecutar `ms-flota-rest`:
+WebSocket STOMP/SockJS:
 
-```powershell
-Push-Location backend\ms-flota-rest
-.\mvnw.cmd spring-boot:run
-Pop-Location
-```
+- Handshake: http://localhost/ws-tracking.
+- Tópicos: /topic/shipment/{shipmentId} y /topic/order/{orderId}.
+- ms-seguimiento no declara controladores REST.
 
-Compilar y probar `ms-taller-soap`:
+## Eventos RabbitMQ
 
-```powershell
-Push-Location backend\ms-taller-soap
-.\mvnw.cmd test
-Pop-Location
-```
+Exchange topic: logiflow.exchange.
 
-Ejecutar `ms-taller-soap`:
-
-```powershell
-Push-Location backend\ms-taller-soap
-.\mvnw.cmd spring-boot:run
-Pop-Location
-```
-
-## ms-flota-rest
-
-Puerto local: `8081`
-
-Documentacion:
-
-- Swagger UI: `http://localhost:8081/swagger-ui.html`
-- OpenAPI JSON: `http://localhost:8081/api-docs`
-
-Endpoints:
-
-- `GET /api/vehicles`
-- `GET /api/vehicles/{id}`
-- `POST /api/vehicles`
-- `PUT /api/vehicles/{id}`
-- `DELETE /api/vehicles/{id}`
-- `GET /api/vehicles/available`
-- `GET /api/drivers`
-- `GET /api/drivers/{id}`
-- `POST /api/drivers`
-- `PUT /api/drivers/{id}`
-- `DELETE /api/drivers/{id}`
-- `GET /api/drivers/available`
-- `GET /api/fleet/availability`
-
-Este servicio expone solo REST. No contiene GraphQL, WebSockets ni mensajeria.
-
-## ms-taller-rest
-
-Puerto local: `8089`
-
-Documentacion:
-
-- Swagger UI: `http://localhost:8089/swagger-ui.html`
-- OpenAPI JSON: `http://localhost:8089/api-docs`
-
-Endpoints:
-
-- `GET /api/vehiculos/{matricula}`
-- `POST /api/mantenimientos`
-- `GET /vehiculos/{matricula}`
-- `POST /mantenimientos`
-
-Este servicio expone solo REST. No contiene GraphQL, WebSockets ni mensajeria.
-
-## Pipeline Fase 1
-
-Workflow: `.github/workflows/backend-ci.yml`
-
-Se ejecuta en:
-
-- `push` a `main`.
-- `push` a `development`.
-- `pull_request` hacia `main`.
-- `pull_request` hacia `development`.
-
-Valida solo:
-
-- `backend/ms-flota-rest`
-- `backend/ms-taller-soap`
-- `sonar-project.properties`
-
-Pasos del pipeline:
-
-- valida que existan los secrets externos requeridos;
-- configura JDK 21;
-- ejecuta `./mvnw -B test` en `ms-flota-rest`;
-- ejecuta `./mvnw -B test` en `ms-taller-rest`;
-- ejecuta SonarCloud con `sonar-project.properties`;
-- consulta resumen de SonarCloud: bugs, vulnerabilities, code smells y coverage;
-- envia resumen a Telegram.
-
-## Secrets obligatorios en GitHub Actions
-
-Crear en GitHub: `Settings > Secrets and variables > Actions > New repository secret`.
-
-| Secret | Valor exacto esperado | Proposito |
+| Routing key | Productor | Consumidor |
 | --- | --- | --- |
-| `SONAR_TOKEN` | Token generado en SonarCloud para este proyecto | Permite ejecutar analisis y consultar metricas |
-| `SONAR_PROJECT_KEY` | Project Key del proyecto en SonarCloud | Identifica el proyecto analizado |
-| `SONAR_ORGANIZATION` | Organization Key de SonarCloud | Identifica la organizacion |
-| `TELEGRAM_BOT_TOKEN` | Token del bot creado con BotFather | Permite enviar mensajes a Telegram |
-| `TELEGRAM_CHAT_ID` | ID numerico del chat o grupo destino | Define a donde se envia el resumen |
+| pedido.creado | ms-pedidos | ms-ruteo |
+| pedido.cancelado | ms-pedidos | consumidores futuros |
+| envio.asignado | ms-ruteo | ms-pedidos |
+| posicion.actualizada | dispositivo/simulador | ms-seguimiento y graphql-gateway |
 
-Si falta cualquiera de estos secrets, el pipeline falla al inicio. Esto evita una falsa entrega con SonarCloud o Telegram "opcional".
+La arquitectura y el procedimiento de evidencia están en docs/arquitectura-fase2.md. Las solicitudes reproducibles están en test-endpoints.http.
 
-## Configuracion de SonarCloud
+## CI/CD
 
-Archivo usado por el pipeline: `sonar-project.properties`.
-
-El archivo analiza solo Fase 1:
-
-- `backend/ms-flota-rest/src/main/java`
-- `backend/ms-taller-soap/src/main/java`
-
-Excluye:
-
-- `frontend/**`
-- `infrastructure/**`
-- `target/**`
-- `.idea/**`
-
-La cobertura se toma de JaCoCo:
-
-- `backend/ms-flota-rest/target/site/jacoco/jacoco.xml`
-- `backend/ms-taller-soap/target/site/jacoco/jacoco.xml`
-
-## Rama development
-
-El PDF exige `main` y `development`.
-
-Crear y publicar `development` desde el estado actual:
-
-```bash
-git switch -c development
-git push -u origin development
-```
-
-Si la rama ya existe localmente:
-
-```bash
-git switch development
-git push -u origin development
-```
-
-Verificar ramas:
-
-```bash
-git branch --all
-```
-
-Debe aparecer:
-
-- `main`
-- `development`
-- `remotes/origin/main`
-- `remotes/origin/development`
-
-## Mas detalle DevOps
-
-La guia operativa completa esta en `docs/devops-fase1.md`.
+.github/workflows/backend-ci.yml conserva main y development, prueba los ocho servicios, analiza todos los módulos con SonarCloud y notifica a Telegram. Usa los mismos secrets de docs/devops-fase1.md.

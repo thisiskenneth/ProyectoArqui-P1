@@ -5,6 +5,8 @@ import ec.edu.espe.mstallersoap.dto.request.MantenimientoRequest;
 import ec.edu.espe.mstallersoap.dto.response.MantenimientoResponse;
 import ec.edu.espe.mstallersoap.service.MaintenanceService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,10 @@ public class MaintenanceRestController {
     private final MaintenanceService maintenanceService;
 
     @GetMapping("/vehiculos/{matricula}")
-    public ResponseEntity<VehiculoMaintenanceDto> consultarVehiculo(@PathVariable String matricula) {
+    public ResponseEntity<VehiculoMaintenanceDto> consultarVehiculo(
+            @PathVariable
+            @NotBlank(message = "La matricula es obligatoria")
+            @Size(min = 2, max = 20, message = "La matricula debe tener entre 2 y 20 caracteres") String matricula) {
         return ResponseEntity.ok(maintenanceService.consultar(matricula));
     }
 

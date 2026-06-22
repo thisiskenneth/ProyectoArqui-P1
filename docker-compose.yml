@@ -1,31 +1,100 @@
+x-postgres-env: &postgres-env
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+
 services:
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: logiflow-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   db-flota:
     image: postgres:15-alpine
-    container_name: db-flota
     environment:
+      <<: *postgres-env
       POSTGRES_DB: flotadb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     volumes:
       - pgdata-flota:/var/lib/postgresql/data
 
   db-taller:
     image: postgres:15-alpine
-    container_name: db-taller
     environment:
+      <<: *postgres-env
       POSTGRES_DB: tallerdb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     volumes:
       - pgdata-taller:/var/lib/postgresql/data
 
+  db-auth:
+    image: postgres:15-alpine
+    environment:
+      <<: *postgres-env
+      POSTGRES_DB: authdb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - pgdata-auth:/var/lib/postgresql/data
+
+  db-clientes:
+    image: postgres:15-alpine
+    environment:
+      <<: *postgres-env
+      POSTGRES_DB: clientesdb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - pgdata-clientes:/var/lib/postgresql/data
+
+  db-pedidos:
+    image: postgres:15-alpine
+    environment:
+      <<: *postgres-env
+      POSTGRES_DB: pedidosdb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - pgdata-pedidos:/var/lib/postgresql/data
+
+  db-ruteo:
+    image: postgres:15-alpine
+    environment:
+      <<: *postgres-env
+      POSTGRES_DB: ruteodb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - pgdata-ruteo:/var/lib/postgresql/data
+
   ms-flota-rest:
     build: ./backend/ms-flota-rest
-    container_name: ms-flota-rest
     ports:
       - "8081:8081"
     environment:
@@ -34,12 +103,13 @@ services:
       DB_PASSWORD: postgres
       TALLER_API_URL: http://ms-taller-rest:8089/api
     depends_on:
-      - db-flota
-      - ms-taller-rest
+      db-flota:
+        condition: service_healthy
+      ms-taller-rest:
+        condition: service_started
 
   ms-taller-rest:
     build: ./backend/ms-taller-soap
-    container_name: ms-taller-rest
     ports:
       - "8089:8089"
     environment:
@@ -47,8 +117,119 @@ services:
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
     depends_on:
-      - db-taller
+      db-taller:
+        condition: service_healthy
+
+  ms-auth:
+    build: ./backend/ms-auth
+    ports:
+      - "8088:8088"
+    environment:
+      DB_URL: jdbc:postgresql://db-auth:5432/authdb
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: logiflow-phase2-compose-secret-key-change-me
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      db-auth:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  ms-clientes:
+    build: ./backend/ms-clientes
+    ports:
+      - "8086:8086"
+    environment:
+      DB_URL: jdbc:postgresql://db-clientes:5432/clientesdb
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      db-clientes:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  ms-pedidos:
+    build: ./backend/ms-pedidos
+    ports:
+      - "8087:8087"
+    environment:
+      DB_URL: jdbc:postgresql://db-pedidos:5432/pedidosdb
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      db-pedidos:
+        condition: service_started
+
+  ms-ruteo:
+    build: ./backend/ms-ruteo
+    ports:
+      - "8082:8082"
+    environment:
+      DB_URL: jdbc:postgresql://db-ruteo:5432/ruteodb
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      RABBITMQ_HOST: rabbitmq
+      FLEET_SERVICE_URL: http://ms-flota-rest:8081/api/vehicles/available
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      db-ruteo:
+        condition: service_started
+      ms-flota-rest:
+        condition: service_started
+
+  ms-seguimiento:
+    build: ./backend/ms-seguimiento
+    ports:
+      - "8083:8083"
+    environment:
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  graphql-gateway:
+    build: ./backend/graphql-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      ORDERS_SERVICE_URL: http://ms-pedidos:8087/api/orders
+      SHIPMENTS_SERVICE_URL: http://ms-ruteo:8082/api/shipments
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      ms-pedidos:
+        condition: service_started
+      ms-ruteo:
+        condition: service_started
+
+  api-gateway:
+    image: nginx:1.27-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./infrastructure/docker/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - ms-auth
+      - ms-clientes
+      - ms-flota-rest
+      - ms-taller-rest
+      - ms-pedidos
+      - ms-ruteo
+      - ms-seguimiento
+      - graphql-gateway
 
 volumes:
   pgdata-flota:
   pgdata-taller:
+  pgdata-auth:
+  pgdata-clientes:
+  pgdata-pedidos:
+  pgdata-ruteo:

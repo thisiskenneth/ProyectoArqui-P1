@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Aggregator POM for the LogiFlow Phase 2 backend.
+
+  This is NOT a parent POM: each microservice keeps its own
+  spring-boot-starter-parent and builds independently (as CI does).
+  Its only purpose is to let IntelliJ IDEA import every microservice
+  as a single multi-module Maven project so each Spring Boot app can
+  be launched from the IDE. Opening this file as a project in IntelliJ
+  loads the eight services below.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ec.edu.espe</groupId>
+    <artifactId>logiflow-backend</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>logiflow-backend</name>
+    <description>Aggregator of the LogiFlow Phase 2 microservices for IDE import</description>
+
+    <modules>
+        <module>ms-flota-rest</module>
+        <module>ms-taller-soap</module>
+        <module>ms-auth</module>
+        <module>ms-clientes</module>
+        <module>ms-pedidos</module>
+        <module>ms-ruteo</module>
+        <module>ms-seguimiento</module>
+        <module>graphql-gateway</module>
+    </modules>
+</project>

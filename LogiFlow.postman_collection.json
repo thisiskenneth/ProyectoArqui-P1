@@ -1,0 +1,2021 @@
+{
+  "info": {
+    "name": "LogiFlow - Fase 2 (local)",
+    "description": "Coleccion completa de endpoints REST, GraphQL y RabbitMQ de LogiFlow Fase 2.\n\nServicios locales (IntelliJ/mvnw) + PostgreSQL local + RabbitMQ en Docker.\nEjecuta las carpetas en orden (Collection Runner) para un flujo end-to-end: auth -> clientes -> flota -> taller -> pedidos -> ruteo -> seguimiento -> graphql.\nLas variables (ids, jwt) se capturan automaticamente entre peticiones.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. ms-auth (8088) - REST",
+      "item": [
+        {
+          "name": "Register - operador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Crea un usuario. Reejecutar puede fallar si el username ya existe.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"operador\",\n  \"password\": \"LogiFlow-2026\",\n  \"email\": \"operador@logiflow.ec\",\n  \"roles\": [\n    \"OPERATOR\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{auth_url}}/api/auth/register",
+              "host": [
+                "{{auth_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login - operador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.collectionVariables.set('jwt', j.token);",
+                  "pm.test('token recibido', () => pm.expect(j.token).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"operador\",\n  \"password\": \"LogiFlow-2026\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{auth_url}}/api/auth/login",
+              "host": [
+                "{{auth_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Verify token (valido)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('valido = true', () => pm.expect(pm.response.text()).to.eql('true'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{auth_url}}/api/auth/verify?token={{jwt}}",
+              "host": [
+                "{{auth_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "verify"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Verify token (invalido)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('invalido = false', () => pm.expect(pm.response.text()).to.eql('false'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{auth_url}}/api/auth/verify?token=token-falso",
+              "host": [
+                "{{auth_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "verify"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "token-falso"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. ms-clientes (8086) - REST",
+      "item": [
+        {
+          "name": "Crear cuenta corporativa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "var j = pm.response.json();",
+                  "pm.collectionVariables.set('corporateAccountId', j.id);",
+                  "pm.test('corporateAccountId capturado', () => pm.expect(pm.collectionVariables.get('corporateAccountId')).to.not.be.undefined);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ruc\": \"1790012345001\",\n  \"businessName\": \"ESPE Logistica\",\n  \"creditLimit\": 10000,\n  \"industry\": \"Educacion\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{clientes_url}}/api/corporate-accounts",
+              "host": [
+                "{{clientes_url}}"
+              ],
+              "path": [
+                "api",
+                "corporate-accounts"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar cuentas corporativas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{clientes_url}}/api/corporate-accounts",
+              "host": [
+                "{{clientes_url}}"
+              ],
+              "path": [
+                "api",
+                "corporate-accounts"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener cuenta corporativa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{clientes_url}}/api/corporate-accounts/{{corporateAccountId}}",
+              "host": [
+                "{{clientes_url}}"
+              ],
+              "path": [
+                "api",
+                "corporate-accounts",
+                "{{corporateAccountId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar cuenta corporativa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ruc\": \"1790012345001\",\n  \"businessName\": \"ESPE Logistica S.A.\",\n  \"creditLimit\": 15000,\n  \"industry\": \"Educacion\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{clientes_url}}/api/corporate-accounts/{{corporateAccountId}}",
+              "host": [
+                "{{clientes_url}}"
+              ],
+              "path": [
+                "api",
+                "corporate-accounts",
+                "{{corporateAccountId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "var j = pm.response.json();",
+                  "pm.collectionVariables.set('clientId', j.id);",
+                  "pm.test('clientId capturado', () => pm.expect(pm.collectionVariables.get('clientId')).to.not.be.undefined);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Paredes\",\n  \"email\": \"ana@example.com\",\n  \"phone\": \"0999999999\",\n  \"address\": \"Sangolqui\",\n  \"corporateAccountId\": \"{{corporateAccountId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{clientes_url}}/api/clients",
+              "host": [
+                "{{clientes_url}}"
+              ],
+              "path": [
+                "api",
+                "clients"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar clientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{clientes_url}}/api/clients",
+              "host": [
+                "{{clientes_url}}"
+              ],
+              "path": [
+                "api",
+                "clients"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{clientes_url}}/api/clients/{{clientId}}",
+              "host": [
+                "{{clientes_url}}"
+              ],
+              "path": [
+                "api",
+                "clients",
+                "{{clientId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Ana Maria\",\n  \"lastName\": \"Paredes\",\n  \"email\": \"ana@example.com\",\n  \"phone\": \"0988888888\",\n  \"address\": \"Quito\",\n  \"corporateAccountId\": \"{{corporateAccountId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{clientes_url}}/api/clients/{{clientId}}",
+              "host": [
+                "{{clientes_url}}"
+              ],
+              "path": [
+                "api",
+                "clients",
+                "{{clientId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. ms-flota-rest (8081) - REST",
+      "item": [
+        {
+          "name": "Crear vehiculo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "var j = pm.response.json();",
+                  "pm.collectionVariables.set('vehicleId', j.id);",
+                  "pm.collectionVariables.set('plate', j.plate);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plate\": \"PBA-2040\",\n  \"type\": \"Furgoneta\",\n  \"capacityKg\": 1200,\n  \"autonomyKm\": 450,\n  \"status\": \"AVAILABLE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{flota_url}}/api/vehicles",
+              "host": [
+                "{{flota_url}}"
+              ],
+              "path": [
+                "api",
+                "vehicles"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar vehiculos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{flota_url}}/api/vehicles",
+              "host": [
+                "{{flota_url}}"
+              ],
+              "path": [
+                "api",
+                "vehicles"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Vehiculos disponibles",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{flota_url}}/api/vehicles/available",
+              "host": [
+                "{{flota_url}}"
+              ],
+              "path": [
+                "api",
+                "vehicles",
+                "available"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener vehiculo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{flota_url}}/api/vehicles/{{vehicleId}}",
+              "host": [
+                "{{flota_url}}"
+              ],
+              "path": [
+                "api",
+                "vehicles",
+                "{{vehicleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar vehiculo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plate\": \"PBA-2040\",\n  \"type\": \"Furgoneta\",\n  \"capacityKg\": 1500,\n  \"autonomyKm\": 500,\n  \"status\": \"AVAILABLE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{flota_url}}/api/vehicles/{{vehicleId}}",
+              "host": [
+                "{{flota_url}}"
+              ],
+              "path": [
+                "api",
+                "vehicles",
+                "{{vehicleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear conductor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "var j = pm.response.json();",
+                  "pm.collectionVariables.set('driverId', j.id);",
+                  "pm.test('driverId capturado', () => pm.expect(pm.collectionVariables.get('driverId')).to.not.be.undefined);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Luis\",\n  \"lastName\": \"Tipan\",\n  \"licenseNumber\": \"1710034065\",\n  \"phone\": \"0991112233\",\n  \"available\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{flota_url}}/api/drivers",
+              "host": [
+                "{{flota_url}}"
+              ],
+              "path": [
+                "api",
+                "drivers"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar conductores",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{flota_url}}/api/drivers",
+              "host": [
+                "{{flota_url}}"
+              ],
+              "path": [
+                "api",
+                "drivers"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Conductores disponibles",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{flota_url}}/api/drivers/available",
+              "host": [
+                "{{flota_url}}"
+              ],
+              "path": [
+                "api",
+                "drivers",
+                "available"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener conductor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{flota_url}}/api/drivers/{{driverId}}",
+              "host": [
+                "{{flota_url}}"
+              ],
+              "path": [
+                "api",
+                "drivers",
+                "{{driverId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar conductor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Luis Alberto\",\n  \"lastName\": \"Tipan\",\n  \"licenseNumber\": \"1710034065\",\n  \"phone\": \"0990001122\",\n  \"available\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{flota_url}}/api/drivers/{{driverId}}",
+              "host": [
+                "{{flota_url}}"
+              ],
+              "path": [
+                "api",
+                "drivers",
+                "{{driverId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Disponibilidad de flota (para ruteo)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{flota_url}}/api/fleet/availability",
+              "host": [
+                "{{flota_url}}"
+              ],
+              "path": [
+                "api",
+                "fleet",
+                "availability"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Info de mantenimiento del vehiculo (flota -> taller)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Consume ms-taller. Requiere ms-taller-rest en 8089.",
+            "url": {
+              "raw": "{{flota_url}}/api/vehicles/{{vehicleId}}/maintenance",
+              "host": [
+                "{{flota_url}}"
+              ],
+              "path": [
+                "api",
+                "vehicles",
+                "{{vehicleId}}",
+                "maintenance"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear orden de mantenimiento (flota -> taller)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Proxy REST de flota que registra la orden en ms-taller.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"Cambio de aceite y revision de frenos\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{flota_url}}/api/vehicles/{{vehicleId}}/maintenance-orders",
+              "host": [
+                "{{flota_url}}"
+              ],
+              "path": [
+                "api",
+                "vehicles",
+                "{{vehicleId}}",
+                "maintenance-orders"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. ms-taller (8089) - REST (ex-SOAP)",
+      "item": [
+        {
+          "name": "Consultar vehiculo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{taller_url}}/vehiculos/{{plate}}",
+              "host": [
+                "{{taller_url}}"
+              ],
+              "path": [
+                "vehiculos",
+                "{{plate}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Consultar vehiculo (/api)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{taller_url}}/api/vehiculos/{{plate}}",
+              "host": [
+                "{{taller_url}}"
+              ],
+              "path": [
+                "api",
+                "vehiculos",
+                "{{plate}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Registrar mantenimiento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"matricula\": \"{{plate}}\",\n  \"descripcion\": \"Revision general de motor\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{taller_url}}/mantenimientos",
+              "host": [
+                "{{taller_url}}"
+              ],
+              "path": [
+                "mantenimientos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Registrar mantenimiento (/api)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"matricula\": \"{{plate}}\",\n  \"descripcion\": \"Cambio de filtros\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{taller_url}}/api/mantenimientos",
+              "host": [
+                "{{taller_url}}"
+              ],
+              "path": [
+                "api",
+                "mantenimientos"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. ms-pedidos (8087) - REST + RabbitMQ",
+      "item": [
+        {
+          "name": "Crear pedido (publica pedido.creado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "var j = pm.response.json();",
+                  "pm.collectionVariables.set('orderId', j.id);",
+                  "pm.test('orderId capturado', () => pm.expect(pm.collectionVariables.get('orderId')).to.not.be.undefined);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Persiste en pedidosdb y publica 'pedido.creado'. ms-ruteo lo auto-asigna si esta arriba.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": \"1\",\n  \"customerEmail\": \"ana@example.com\",\n  \"items\": [\n    \"CAJA-001\"\n  ],\n  \"total\": 25.5,\n  \"weightKg\": 8.0,\n  \"geographicLevel\": \"LOCAL\",\n  \"vehicleType\": \"Furgoneta\",\n  \"origin\": \"Sangolqui\",\n  \"destination\": \"Quito\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{pedidos_url}}/api/orders",
+              "host": [
+                "{{pedidos_url}}"
+              ],
+              "path": [
+                "api",
+                "orders"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar pedidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{pedidos_url}}/api/orders",
+              "host": [
+                "{{pedidos_url}}"
+              ],
+              "path": [
+                "api",
+                "orders"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{pedidos_url}}/api/orders/{{orderId}}",
+              "host": [
+                "{{pedidos_url}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "{{orderId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Pedidos activos por cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{pedidos_url}}/api/orders/active/client/1",
+              "host": [
+                "{{pedidos_url}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "active",
+                "client",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Marcar pedido entregado (publica pedido.entregado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{pedidos_url}}/api/orders/{{orderId}}/deliver",
+              "host": [
+                "{{pedidos_url}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "{{orderId}}",
+                "deliver"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear pedido para cancelar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "var j = pm.response.json();",
+                  "pm.collectionVariables.set('cancelOrderId', j.id);",
+                  "pm.test('cancelOrderId capturado', () => pm.expect(pm.collectionVariables.get('cancelOrderId')).to.not.be.undefined);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": \"1\",\n  \"customerEmail\": \"ana@example.com\",\n  \"items\": [\n    \"CAJA-001\"\n  ],\n  \"total\": 25.5,\n  \"weightKg\": 8.0,\n  \"geographicLevel\": \"LOCAL\",\n  \"vehicleType\": \"Furgoneta\",\n  \"origin\": \"Sangolqui\",\n  \"destination\": \"Quito\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{pedidos_url}}/api/orders",
+              "host": [
+                "{{pedidos_url}}"
+              ],
+              "path": [
+                "api",
+                "orders"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cancelar pedido (publica pedido.cancelado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{pedidos_url}}/api/orders/{{cancelOrderId}}/cancel",
+              "host": [
+                "{{pedidos_url}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "{{cancelOrderId}}",
+                "cancel"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. ms-ruteo (8082) - REST + RabbitMQ",
+      "item": [
+        {
+          "name": "Asignar envio (publica envio.asignado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "var j = pm.response.json();",
+                  "pm.collectionVariables.set('shipmentId', j.id);",
+                  "pm.test('shipmentId capturado', () => pm.expect(pm.collectionVariables.get('shipmentId')).to.not.be.undefined);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Consulta vehiculos disponibles en flota (8081) y publica 'envio.asignado'. Requiere un vehiculo AVAILABLE.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"customerEmail\": \"ana@example.com\",\n  \"origin\": \"Sangolqui\",\n  \"destination\": \"Quito\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{ruteo_url}}/api/shipments/assign",
+              "host": [
+                "{{ruteo_url}}"
+              ],
+              "path": [
+                "api",
+                "shipments",
+                "assign"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar envios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{ruteo_url}}/api/shipments",
+              "host": [
+                "{{ruteo_url}}"
+              ],
+              "path": [
+                "api",
+                "shipments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener envio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{ruteo_url}}/api/shipments/{{shipmentId}}",
+              "host": [
+                "{{ruteo_url}}"
+              ],
+              "path": [
+                "api",
+                "shipments",
+                "{{shipmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Envios por pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{ruteo_url}}/api/shipments/order/{{orderId}}",
+              "host": [
+                "{{ruteo_url}}"
+              ],
+              "path": [
+                "api",
+                "shipments",
+                "order",
+                "{{orderId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. ms-seguimiento (8083) - WebSocket + RabbitMQ",
+      "item": [
+        {
+          "name": "Handshake SockJS (info)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Chequeo HTTP del endpoint SockJS. El tracking real usa STOMP sobre /ws-tracking con topicos /topic/shipment/{id} y /topic/order/{id}; usa un cliente STOMP para suscribirte.",
+            "url": {
+              "raw": "{{seguimiento_url}}/ws-tracking/info",
+              "host": [
+                "{{seguimiento_url}}"
+              ],
+              "path": [
+                "ws-tracking",
+                "info"
+              ]
+            }
+          }
+        },
+        {
+          "name": "RabbitMQ - Publicar posicion.actualizada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('mensaje ruteado', () => pm.expect(pm.response.json().routed).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Simula el evento de posicion. ms-seguimiento lo reenvia por WebSocket y el gateway lo guarda como ultima posicion.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"properties\": {},\n  \"routing_key\": \"posicion.actualizada\",\n  \"payload\": \"{\\\"shipmentId\\\": \\\"{{shipmentId}}\\\", \\\"orderId\\\": \\\"{{orderId}}\\\", \\\"lat\\\": -0.3149, \\\"lng\\\": -78.4438, \\\"speed\\\": 42.0, \\\"eta\\\": \\\"2026-06-22T13:00:00-05:00\\\", \\\"timestamp\\\": \\\"2026-06-22T12:00:00-05:00\\\"}\",\n  \"payload_encoding\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "guest"
+                },
+                {
+                  "key": "password",
+                  "value": "guest"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{rabbit_url}}/api/exchanges/%2F/logiflow.exchange/publish",
+              "host": [
+                "{{rabbit_url}}"
+              ],
+              "path": [
+                "api",
+                "exchanges",
+                "%2F",
+                "logiflow.exchange",
+                "publish"
+              ]
+            }
+          }
+        },
+        {
+          "name": "RabbitMQ - Overview",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "guest"
+                },
+                {
+                  "key": "password",
+                  "value": "guest"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{rabbit_url}}/api/overview",
+              "host": [
+                "{{rabbit_url}}"
+              ],
+              "path": [
+                "api",
+                "overview"
+              ]
+            }
+          }
+        },
+        {
+          "name": "RabbitMQ - Listar exchanges",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "guest"
+                },
+                {
+                  "key": "password",
+                  "value": "guest"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{rabbit_url}}/api/exchanges",
+              "host": [
+                "{{rabbit_url}}"
+              ],
+              "path": [
+                "api",
+                "exchanges"
+              ]
+            }
+          }
+        },
+        {
+          "name": "RabbitMQ - Listar colas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "guest"
+                },
+                {
+                  "key": "password",
+                  "value": "guest"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{rabbit_url}}/api/queues",
+              "host": [
+                "{{rabbit_url}}"
+              ],
+              "path": [
+                "api",
+                "queues"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. graphql-gateway (8080) - GraphQL",
+      "item": [
+        {
+          "name": "Mutation crearPedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('sin errores graphql', () => pm.expect(j.errors).to.be.undefined);",
+                  "pm.collectionVariables.set('gqlOrderId', j.data.crearPedido.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "description": "El gateway llama internamente al REST de ms-pedidos y publica el evento.",
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation Crear($input: PedidoInput!) {\n  crearPedido(input: $input) {\n    id clienteId status origin destination total\n  }\n}",
+                "variables": "{\"input\": {\"clienteId\": \"1\", \"customerEmail\": \"ana@example.com\", \"items\": [\"CAJA-010\"], \"total\": 40.0, \"weightKg\": 12.0, \"geographicLevel\": \"PROVINCIAL\", \"vehicleType\": \"Furgoneta\", \"origin\": \"Sangolqui\", \"destination\": \"Ambato\"}}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}/graphql",
+              "host": [
+                "{{graphql_url}}"
+              ],
+              "path": [
+                "graphql"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Query pedidosActivos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('sin errores graphql', () => pm.expect(pm.response.json().errors).to.be.undefined);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query { pedidosActivos(clienteId: \"1\") { id clienteId status origin destination } }",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}/graphql",
+              "host": [
+                "{{graphql_url}}"
+              ],
+              "path": [
+                "graphql"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Query envio (con ultima posicion)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('sin errores graphql', () => pm.expect(pm.response.json().errors).to.be.undefined);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query Envio($id: ID!) { envio(id: $id) { id orderId vehiclePlate status lastPosition { lat lng speed eta timestamp } } }",
+                "variables": "{\"id\": \"{{shipmentId}}\"}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}/graphql",
+              "host": [
+                "{{graphql_url}}"
+              ],
+              "path": [
+                "graphql"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mutation cancelarPedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('sin errores graphql', () => pm.expect(pm.response.json().errors).to.be.undefined);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation Cancelar($id: ID!) { cancelarPedido(id: $id) { id status } }",
+                "variables": "{\"id\": \"{{gqlOrderId}}\"}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}/graphql",
+              "host": [
+                "{{graphql_url}}"
+              ],
+              "path": [
+                "graphql"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Limpieza (opcional)",
+      "item": [
+        {
+          "name": "Eliminar cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204 No Content', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{clientes_url}}/api/clients/{{clientId}}",
+              "host": [
+                "{{clientes_url}}"
+              ],
+              "path": [
+                "api",
+                "clients",
+                "{{clientId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar cuenta corporativa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204 No Content', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{clientes_url}}/api/corporate-accounts/{{corporateAccountId}}",
+              "host": [
+                "{{clientes_url}}"
+              ],
+              "path": [
+                "api",
+                "corporate-accounts",
+                "{{corporateAccountId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar conductor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204 No Content', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{flota_url}}/api/drivers/{{driverId}}",
+              "host": [
+                "{{flota_url}}"
+              ],
+              "path": [
+                "api",
+                "drivers",
+                "{{driverId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar vehiculo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204 No Content', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{flota_url}}/api/vehicles/{{vehicleId}}",
+              "host": [
+                "{{flota_url}}"
+              ],
+              "path": [
+                "api",
+                "vehicles",
+                "{{vehicleId}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "auth_url",
+      "value": "http://localhost:8088"
+    },
+    {
+      "key": "clientes_url",
+      "value": "http://localhost:8086"
+    },
+    {
+      "key": "flota_url",
+      "value": "http://localhost:8081"
+    },
+    {
+      "key": "taller_url",
+      "value": "http://localhost:8089"
+    },
+    {
+      "key": "pedidos_url",
+      "value": "http://localhost:8087"
+    },
+    {
+      "key": "ruteo_url",
+      "value": "http://localhost:8082"
+    },
+    {
+      "key": "seguimiento_url",
+      "value": "http://localhost:8083"
+    },
+    {
+      "key": "graphql_url",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "rabbit_url",
+      "value": "http://localhost:15672"
+    },
+    {
+      "key": "jwt",
+      "value": ""
+    },
+    {
+      "key": "corporateAccountId",
+      "value": ""
+    },
+    {
+      "key": "clientId",
+      "value": ""
+    },
+    {
+      "key": "vehicleId",
+      "value": ""
+    },
+    {
+      "key": "plate",
+      "value": ""
+    },
+    {
+      "key": "driverId",
+      "value": ""
+    },
+    {
+      "key": "orderId",
+      "value": ""
+    },
+    {
+      "key": "cancelOrderId",
+      "value": ""
+    },
+    {
+      "key": "shipmentId",
+      "value": ""
+    },
+    {
+      "key": "gqlOrderId",
+      "value": ""
+    }
+  ]
+}
